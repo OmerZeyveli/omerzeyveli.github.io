@@ -1,0 +1,30 @@
+---
+import { siteConfig } from "../../config/site";
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <a href="/" class="text-sm font-semibold tracking-[0.2em] text-zinc-100 uppercase">
+      {siteConfig.name}
+    </a>
+
+    <nav class="hidden items-center gap-6 md:flex">
+      {siteConfig.nav.map((item) => {
+        const isActive = currentPath === item.href || (item.href !== "/" && currentPath.startsWith(item.href));
+        return (
+          <a
+            href={item.href}
+            class:list={[
+              "text-sm transition-colors",
+              isActive ? "text-zinc-100" : "text-zinc-400 hover:text-zinc-200",
+            ]}
+          >
+            {item.label}
+          </a>
+        );
+      })}
+    </nav>
+  </div>
+</header>

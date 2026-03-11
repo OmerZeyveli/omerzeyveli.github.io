@@ -1,0 +1,25 @@
+---
+title: "Hello World"
+description: "A short note about the new site structure."
+pubDate: 2026-03-11
+category: "note"
+tags: ["intro", "site"]
+cover: ../../assets/content/writing/hello-world-cover.jpg
+coverAlt: "Abstract dark editorial cover image"
+featured: true
+draft: false
+---
+
+import Figure from "../../components/content/Figure.astro";
+import YouTubeEmbed from "../../components/content/YouTubeEmbed.astro";
+import shot1 from "../../assets/content/writing/hello-inline.jpg";
+
+This is the first writing entry on the site.
+
+<Figure
+  src={shot1}
+  alt="Inline visual example"
+  caption="An inline image inside MDX content."
+/>
+
+<YouTubeEmbed id="dQw4w9WgXcQ" title="Example embedded video" />

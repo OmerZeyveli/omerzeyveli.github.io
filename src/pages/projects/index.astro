@@ -1,0 +1,59 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getProjects } from "../../lib/content";
+import { Image } from "astro:assets";
+
+const projects = await getProjects();
+---
+
+<BaseLayout
+  title="Projects"
+  description="Project case studies and experiments."
+>
+  <section class="space-y-8">
+    <div class="space-y-2">
+      <p class="text-sm uppercase tracking-[0.2em] text-zinc-400">Projects</p>
+      <h1 class="text-4xl font-semibold tracking-tight">Projects</h1>
+      <p class="max-w-2xl text-zinc-400">
+        Product work, experiments, tools, and developer-focused case studies.
+      </p>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2">
+      {
+        projects.map((project) => (
+          <a
+            href={`/projects/${project.id}/`}
+            class="overflow-hidden rounded-[1.75rem] border border-zinc-800 transition hover:bg-zinc-900/60"
+          >
+            <Image
+              src={project.data.cover}
+              alt={project.data.coverAlt}
+              class="aspect-[16/10] w-full object-cover"
+              widths={[600, 900, 1200]}
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+
+            <div class="space-y-3 p-5">
+              <div class="flex items-center justify-between gap-4 text-sm text-zinc-500">
+                <span>{project.data.category}</span>
+                <span>{project.data.year}</span>
+              </div>
+
+              <h2 class="text-xl font-medium">{project.data.title}</h2>
+              <p class="text-zinc-400">{project.data.summary}</p>
+
+              <div class="flex flex-wrap gap-2">
+                {project.data.stack.slice(0, 4).map((item) => (
+                  <span class="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-300">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

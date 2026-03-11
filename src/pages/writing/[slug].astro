@@ -1,0 +1,28 @@
+---
+import { getCollection, render } from "astro:content";
+import PostLayout from "../../layouts/PostLayout.astro";
+import Figure from "../../components/content/Figure.astro";
+import YouTubeEmbed from "../../components/content/YouTubeEmbed.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("writing", ({ data }) => !data.draft);
+
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<PostLayout
+  title={post.data.title}
+  description={post.data.description}
+  pubDate={post.data.pubDate}
+  cover={post.data.cover}
+  coverAlt={post.data.coverAlt}
+>
+  <Content components={{ Figure, YouTubeEmbed }} />
+</PostLayout>

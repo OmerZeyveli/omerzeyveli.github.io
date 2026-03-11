@@ -1,0 +1,54 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import { Image } from "astro:assets";
+
+interface Props {
+  title: string;
+  description?: string;
+  pubDate?: Date;
+  cover?: any;
+  coverAlt?: string;
+}
+
+const { title, description, pubDate, cover, coverAlt } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="mx-auto max-w-4xl space-y-10">
+    <header class="space-y-5">
+      <div class="space-y-3">
+        <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">
+          {title}
+        </h1>
+        {
+          description && (
+            <p class="max-w-2xl text-lg text-zinc-400">{description}</p>
+          )
+        }
+        {
+          pubDate && (
+            <p class="text-sm text-zinc-500">
+              {pubDate.toLocaleDateString("en-US")}
+            </p>
+          )
+        }
+      </div>
+
+      {
+        cover && coverAlt && (
+          <Image
+            src={cover}
+            alt={coverAlt}
+            class="w-full rounded-[2rem] border border-zinc-800"
+            widths={[900, 1400, 1800]}
+            sizes="(max-width: 1024px) 100vw, 1024px"
+          />
+        )
+      }
+    </header>
+
+    <div class="prose prose-invert max-w-none prose-zinc">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>

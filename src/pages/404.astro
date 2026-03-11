@@ -1,0 +1,21 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Sayfa Bulunamadı">
+  <section
+    class="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-start justify-center space-y-6"
+  >
+    <p class="text-sm uppercase tracking-[0.2em] text-zinc-400">404</p>
+    <h1 class="text-4xl font-semibold tracking-tight">Sayfa bulunamadı</h1>
+    <p class="text-zinc-400">
+      Aradığın sayfa kaldırılmış, taşınmış veya hiç var olmamış olabilir.
+    </p>
+    <a
+      href="/"
+      class="rounded-2xl border border-zinc-800 px-4 py-2 hover:bg-zinc-900"
+    >
+      Ana sayfaya dön
+    </a>
+  </section>
+</BaseLayout>
