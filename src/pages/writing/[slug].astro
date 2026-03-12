@@ -15,14 +15,22 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+const { category, updatedDate } = post.data;
 ---
 
 <PostLayout
   title={post.data.title}
   description={post.data.description}
   pubDate={post.data.pubDate}
+  updatedDate={updatedDate}
   cover={post.data.cover}
   coverAlt={post.data.coverAlt}
 >
+  <div slot="meta" class="flex flex-wrap items-center gap-3 text-sm">
+    <span class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300">
+      {category}
+    </span>
+  </div>
+
   <Content components={{ Figure, YouTubeEmbed }} />
 </PostLayout>

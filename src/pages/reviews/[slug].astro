@@ -15,6 +15,7 @@ export async function getStaticPaths() {
 
 const { review } = Astro.props;
 const { Content } = await render(review);
+const { type, score } = review.data;
 ---
 
 <PostLayout
@@ -24,5 +25,18 @@ const { Content } = await render(review);
   cover={review.data.cover}
   coverAlt={review.data.coverAlt}
 >
+  <div slot="meta" class="flex flex-wrap items-center gap-3 text-sm">
+    <span class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300">
+      {type}
+    </span>
+    {
+      score != null && (
+        <span class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300">
+          {score}/10
+        </span>
+      )
+    }
+  </div>
+
   <Content components={{ Figure, YouTubeEmbed }} />
 </PostLayout>

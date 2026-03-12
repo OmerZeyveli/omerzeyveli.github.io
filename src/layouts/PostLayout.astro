@@ -1,35 +1,65 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import { Image } from "astro:assets";
+import { siteConfig } from "../config/site";
 
 interface Props {
   title: string;
   description?: string;
   pubDate?: Date;
-  cover?: any;
+  updatedDate?: Date;
+  cover?: ImageMetadata;
   coverAlt?: string;
 }
 
-const { title, description, pubDate, cover, coverAlt } = Astro.props;
+const { title, description, pubDate, updatedDate, cover, coverAlt } =
+  Astro.props;
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+const ogImage = cover ? new URL(cover.src, siteConfig.url).href : undefined;
 ---
 
-<BaseLayout title={title} description={description}>
-  <article class="mx-auto max-w-4xl space-y-10">
-    <header class="space-y-5">
+<BaseLayout
+  title={title}
+  description={description}
+  image={ogImage}
+  imageAlt={coverAlt}
+>
+  <article class="mx-auto max-w-3xl space-y-8 sm:space-y-10">
+    <header class="space-y-5 sm:space-y-6">
       <div class="space-y-3">
-        <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">
+        <h1
+          class="text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl"
+        >
           {title}
         </h1>
         {
           description && (
-            <p class="max-w-2xl text-lg text-zinc-400">{description}</p>
+            <p class="max-w-2xl text-lg leading-relaxed text-zinc-400">
+              {description}
+            </p>
           )
         }
         {
           pubDate && (
-            <p class="text-sm text-zinc-500">
-              {pubDate.toLocaleDateString("en-US")}
-            </p>
+            <div class="flex flex-wrap items-center gap-x-3 text-sm text-zinc-500">
+              <time datetime={pubDate.toISOString()}>
+                {dateFormatter.format(pubDate)}
+              </time>
+              {updatedDate && (
+                <span>
+                  · Updated{" "}
+                  <time datetime={updatedDate.toISOString()}>
+                    {dateFormatter.format(updatedDate)}
+                  </time>
+                </span>
+              )}
+            </div>
           )
         }
       </div>
@@ -39,15 +69,17 @@ const { title, description, pubDate, cover, coverAlt } = Astro.props;
           <Image
             src={cover}
             alt={coverAlt}
-            class="w-full rounded-[2rem] border border-zinc-800"
+            class="aspect-[16/10] w-full rounded-2xl border border-zinc-800 object-cover sm:rounded-[2rem]"
             widths={[900, 1400, 1800]}
-            sizes="(max-width: 1024px) 100vw, 1024px"
+            sizes="(max-width: 768px) 100vw, 768px"
           />
         )
       }
     </header>
 
-    <div class="prose prose-invert max-w-none prose-zinc">
+    <slot name="meta" />
+
+    <div class="prose prose-invert prose-zinc max-w-none">
       <slot />
     </div>
   </article>

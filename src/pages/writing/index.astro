@@ -1,46 +1,38 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import WritingCard from "../../components/ui/WritingCard.astro";
 import { getWritingPosts } from "../../lib/content";
-import { Image } from "astro:assets";
 
 const posts = await getWritingPosts();
 ---
 
-<BaseLayout title="Writing" description="Essays, devlogs, notes, and breakdowns.">
-  <section class="space-y-8">
+<BaseLayout
+  title="Writing"
+  description="Essays, devlogs, notes, and breakdowns."
+>
+  <section class="space-y-6 sm:space-y-8">
     <div class="space-y-2">
       <p class="text-sm uppercase tracking-[0.2em] text-zinc-400">Writing</p>
-      <h1 class="text-4xl font-semibold tracking-tight">Writing</h1>
+      <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Writing</h1>
       <p class="max-w-2xl text-zinc-400">
         Essays, development notes, process logs, and technical breakdowns.
       </p>
     </div>
 
     <div class="grid gap-6 md:grid-cols-2">
-      {posts.map((post) => (
-        <a
-          href={`/writing/${post.id}/`}
-          class="overflow-hidden rounded-[1.75rem] border border-zinc-800 transition hover:bg-zinc-900/60"
-        >
-          <Image
-            src={post.data.cover}
-            alt={post.data.coverAlt}
-            class="aspect-[16/10] w-full object-cover"
-            widths={[600, 900, 1200]}
-            sizes="(max-width: 768px) 100vw, 50vw"
+      {
+        posts.map((post) => (
+          <WritingCard
+            href={`/writing/${post.id}/`}
+            cover={post.data.cover}
+            coverAlt={post.data.coverAlt}
+            title={post.data.title}
+            description={post.data.description}
+            category={post.data.category}
+            pubDate={post.data.pubDate}
           />
-
-          <div class="space-y-3 p-5">
-            <div class="flex items-center justify-between gap-4 text-sm text-zinc-500">
-              <span>{post.data.category}</span>
-              <span>{post.data.pubDate.toLocaleDateString("en-US")}</span>
-            </div>
-
-            <h2 class="text-xl font-medium">{post.data.title}</h2>
-            <p class="text-zinc-400">{post.data.description}</p>
-          </div>
-        </a>
-      ))}
+        ))
+      }
     </div>
   </section>
 </BaseLayout>

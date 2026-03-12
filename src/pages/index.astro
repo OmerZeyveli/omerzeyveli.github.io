@@ -1,22 +1,33 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { Image } from "astro:assets";
+import ProjectCard from "../components/ui/ProjectCard.astro";
+import WritingCard from "../components/ui/WritingCard.astro";
+import ReviewCard from "../components/ui/ReviewCard.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import { siteConfig } from "../config/site";
 import {
-  getWritingPosts,
   getFeaturedProjects,
-  getReviews,
+  getLatestWriting,
+  getLatestReviews,
 } from "../lib/content";
 
 const featuredProjects = (await getFeaturedProjects()).slice(0, 3);
-const latestWriting = (await getWritingPosts()).slice(0, 3);
-const latestReviews = (await getReviews()).slice(0, 3);
+const latestWriting = await getLatestWriting(3);
+const latestReviews = await getLatestReviews(3);
 ---
 
-<BaseLayout title="Home">
+<BaseLayout
+  title="Home"
+  description="Developer-first personal site with project case studies, writing, and reviews across games, media, and tech."
+>
   <section class="space-y-6 border-b border-zinc-800 pb-12">
-    <p class="text-sm uppercase tracking-[0.2em] text-zinc-400">Riive</p>
+    <p class="text-sm uppercase tracking-[0.2em] text-zinc-400">
+      {siteConfig.name}
+    </p>
 
-    <h1 class="max-w-4xl text-4xl font-semibold tracking-tight sm:text-6xl">
+    <h1
+      class="max-w-4xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl"
+    >
       Building projects, documenting process, and writing thoughtful reviews.
     </h1>
 
@@ -28,156 +39,110 @@ const latestReviews = (await getReviews()).slice(0, 3);
     <div class="flex flex-wrap gap-3">
       <a
         href="/projects"
-        class="rounded-2xl border border-zinc-800 px-4 py-2 hover:bg-zinc-900"
+        class="rounded-2xl border border-zinc-800 px-4 py-2 text-sm transition-colors hover:bg-zinc-900 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 sm:text-base"
       >
         View Projects
       </a>
       <a
         href="/reviews"
-        class="rounded-2xl border border-zinc-800 px-4 py-2 hover:bg-zinc-900"
+        class="rounded-2xl border border-zinc-800 px-4 py-2 text-sm transition-colors hover:bg-zinc-900 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 sm:text-base"
       >
         Read Reviews
       </a>
       <a
         href="/writing"
-        class="rounded-2xl border border-zinc-800 px-4 py-2 hover:bg-zinc-900"
+        class="rounded-2xl border border-zinc-800 px-4 py-2 text-sm transition-colors hover:bg-zinc-900 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 sm:text-base"
       >
         Explore Writing
       </a>
     </div>
   </section>
 
-  <section class="space-y-6 py-12">
-    <div class="flex items-end justify-between gap-4">
-      <div>
-        <p class="text-sm uppercase tracking-[0.2em] text-zinc-400">Featured</p>
-        <h2 class="text-2xl font-semibold tracking-tight">Featured Projects</h2>
-      </div>
-      <a href="/projects" class="text-sm text-zinc-400 hover:text-zinc-200">
-        All projects →
-      </a>
-    </div>
+  {
+    featuredProjects.length > 0 && (
+      <section class="space-y-6 py-12">
+        <SectionHeading
+          overline="Featured"
+          title="Featured Projects"
+          href="/projects"
+          linkText="All projects"
+        />
 
-    <div class="grid gap-6 md:grid-cols-3">
-      {
-        featuredProjects.map((project) => (
-          <a
-            href={`/projects/${project.id}/`}
-            class="overflow-hidden rounded-[1.75rem] border border-zinc-800 transition hover:bg-zinc-900/60"
-          >
-            <Image
-              src={project.data.cover}
-              alt={project.data.coverAlt}
-              class="aspect-[16/10] w-full object-cover"
-              widths={[600, 900, 1200]}
+        <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+          {featuredProjects.map((project) => (
+            <ProjectCard
+              href={`/projects/${project.id}/`}
+              cover={project.data.cover}
+              coverAlt={project.data.coverAlt}
+              title={project.data.title}
+              summary={project.data.summary}
+              category={project.data.category}
+              year={project.data.year}
+              stack={project.data.stack}
+              headingLevel="h3"
               sizes="(max-width: 768px) 100vw, 33vw"
             />
+          ))}
+        </div>
+      </section>
+    )
+  }
 
-            <div class="space-y-3 p-5">
-              <div class="flex items-center justify-between gap-4 text-sm text-zinc-500">
-                <span>{project.data.category}</span>
-                <span>{project.data.year}</span>
-              </div>
+  {
+    (latestWriting.length > 0 || latestReviews.length > 0) && (
+      <section class="grid gap-8 border-t border-zinc-800 py-12 md:grid-cols-2">
+        {latestWriting.length > 0 && (
+          <div class="space-y-5">
+            <SectionHeading
+              overline="Writing"
+              title="Latest Writing"
+              href="/writing"
+              linkText="All writing"
+            />
 
-              <h3 class="text-lg font-medium">{project.data.title}</h3>
-              <p class="text-sm leading-6 text-zinc-400">
-                {project.data.summary}
-              </p>
-
-              <div class="flex flex-wrap gap-2">
-                {project.data.stack.slice(0, 4).map((item) => (
-                  <span class="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-300">
-                    {item}
-                  </span>
-                ))}
-              </div>
+            <div class="space-y-4">
+              {latestWriting.map((post) => (
+                <WritingCard
+                  href={`/writing/${post.id}/`}
+                  cover={post.data.cover}
+                  coverAlt={post.data.coverAlt}
+                  title={post.data.title}
+                  description={post.data.description}
+                  category={post.data.category}
+                  pubDate={post.data.pubDate}
+                  headingLevel="h3"
+                />
+              ))}
             </div>
-          </a>
-        ))
-      }
-    </div>
-  </section>
+          </div>
+        )}
 
-  <section class="grid gap-8 border-t border-zinc-800 py-12 md:grid-cols-2">
-    <div class="space-y-5">
-      <div class="flex items-end justify-between gap-4">
-        <div>
-          <p class="text-sm uppercase tracking-[0.2em] text-zinc-400">
-            Writing
-          </p>
-          <h2 class="text-2xl font-semibold tracking-tight">Latest Writing</h2>
-        </div>
-        <a href="/writing" class="text-sm text-zinc-400 hover:text-zinc-200">
-          All writing →
-        </a>
-      </div>
+        {latestReviews.length > 0 && (
+          <div class="space-y-5">
+            <SectionHeading
+              overline="Reviews"
+              title="Latest Reviews"
+              href="/reviews"
+              linkText="All reviews"
+            />
 
-      <div class="space-y-4">
-        {
-          latestWriting.map((post) => (
-            <a
-              href={`/writing/${post.id}/`}
-              class="overflow-hidden rounded-[1.5rem] border border-zinc-800 hover:bg-zinc-900/70"
-            >
-              <Image
-                src={post.data.cover}
-                alt={post.data.coverAlt}
-                class="aspect-[16/10] w-full object-cover"
-                widths={[600, 900, 1200]}
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-              <div class="space-y-2 p-4">
-                <h3 class="font-medium">{post.data.title}</h3>
-                <p class="text-sm text-zinc-400">{post.data.description}</p>
-              </div>
-            </a>
-          ))
-        }
-      </div>
-    </div>
-
-    <div class="space-y-5">
-      <div class="flex items-end justify-between gap-4">
-        <div>
-          <p class="text-sm uppercase tracking-[0.2em] text-zinc-400">
-            Reviews
-          </p>
-          <h2 class="text-2xl font-semibold tracking-tight">Latest Reviews</h2>
-        </div>
-        <a href="/reviews" class="text-sm text-zinc-400 hover:text-zinc-200">
-          All reviews →
-        </a>
-      </div>
-
-      <div class="space-y-4">
-        {
-          latestReviews.map((review) => (
-            <a
-              href={`/reviews/${review.id}/`}
-              class="overflow-hidden rounded-[1.5rem] border border-zinc-800 hover:bg-zinc-900/70"
-            >
-              <Image
-                src={review.data.cover}
-                alt={review.data.coverAlt}
-                class="aspect-[16/10] w-full object-cover"
-                widths={[600, 900, 1200]}
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-              <div class="space-y-2 p-4">
-                <div class="flex items-center justify-between gap-3">
-                  <h3 class="font-medium">{review.data.title}</h3>
-                  {review.data.score && (
-                    <span class="text-sm text-zinc-400">
-                      {review.data.score}/10
-                    </span>
-                  )}
-                </div>
-                <p class="text-sm text-zinc-400">{review.data.description}</p>
-              </div>
-            </a>
-          ))
-        }
-      </div>
-    </div>
-  </section>
+            <div class="space-y-4">
+              {latestReviews.map((review) => (
+                <ReviewCard
+                  href={`/reviews/${review.id}/`}
+                  cover={review.data.cover}
+                  coverAlt={review.data.coverAlt}
+                  title={review.data.title}
+                  description={review.data.description}
+                  type={review.data.type}
+                  score={review.data.score}
+                  headingLevel="h3"
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+    )
+  }
 </BaseLayout>

@@ -4,27 +4,129 @@ import { siteConfig } from "../../config/site";
 const currentPath = Astro.url.pathname;
 ---
 
-<header class="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur">
+<header
+  class="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur"
+>
   <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-    <a href="/" class="text-sm font-semibold tracking-[0.2em] text-zinc-100 uppercase">
+    <a
+      href="/"
+      class="text-sm font-semibold tracking-[0.2em] text-zinc-100 uppercase"
+    >
       {siteConfig.name}
     </a>
 
-    <nav class="hidden items-center gap-6 md:flex">
-      {siteConfig.nav.map((item) => {
-        const isActive = currentPath === item.href || (item.href !== "/" && currentPath.startsWith(item.href));
-        return (
-          <a
-            href={item.href}
-            class:list={[
-              "text-sm transition-colors",
-              isActive ? "text-zinc-100" : "text-zinc-400 hover:text-zinc-200",
-            ]}
-          >
-            {item.label}
-          </a>
-        );
-      })}
+    <nav
+      id="desktop-nav"
+      class="hidden items-center gap-6 md:flex"
+      aria-label="Main navigation"
+    >
+      {
+        siteConfig.nav.map((item) => {
+          const isActive =
+            currentPath === item.href ||
+            (item.href !== "/" && currentPath.startsWith(item.href));
+          return (
+            <a
+              href={item.href}
+              class:list={[
+                "text-sm transition-colors",
+                isActive
+                  ? "text-zinc-100"
+                  : "text-zinc-400 hover:text-zinc-200",
+              ]}
+              aria-current={isActive ? "page" : undefined}
+            >
+              {item.label}
+            </a>
+          );
+        })
+      }
     </nav>
+
+    <button
+      id="mobile-menu-toggle"
+      class="inline-flex items-center justify-center rounded-lg p-2 text-zinc-400 hover:text-zinc-100 md:hidden"
+      type="button"
+      aria-expanded="false"
+      aria-controls="mobile-nav"
+      aria-label="Open menu"
+    >
+      <svg
+        id="menu-icon-open"
+        class="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+      </svg>
+      <svg
+        id="menu-icon-close"
+        class="hidden h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M6 18 18 6M6 6l12 12"></path>
+      </svg>
+    </button>
   </div>
+
+  <nav
+    id="mobile-nav"
+    class="hidden border-t border-zinc-800/80 md:hidden"
+    aria-label="Mobile navigation"
+  >
+    <div class="mx-auto max-w-6xl space-y-1 px-6 py-4">
+      {
+        siteConfig.nav.map((item) => {
+          const isActive =
+            currentPath === item.href ||
+            (item.href !== "/" && currentPath.startsWith(item.href));
+          return (
+            <a
+              href={item.href}
+              class:list={[
+                "block rounded-lg px-3 py-2 text-sm transition-colors",
+                isActive
+                  ? "bg-zinc-800/60 text-zinc-100"
+                  : "text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-200",
+              ]}
+              aria-current={isActive ? "page" : undefined}
+            >
+              {item.label}
+            </a>
+          );
+        })
+      }
+    </div>
+  </nav>
 </header>
+
+<script>
+  const toggle = document.getElementById("mobile-menu-toggle");
+  const mobileNav = document.getElementById("mobile-nav");
+  const iconOpen = document.getElementById("menu-icon-open");
+  const iconClose = document.getElementById("menu-icon-close");
+
+  if (toggle && mobileNav && iconOpen && iconClose) {
+    toggle.addEventListener("click", () => {
+      const isOpen = mobileNav.classList.toggle("hidden");
+      const expanded = !isOpen;
+      toggle.setAttribute("aria-expanded", String(expanded));
+      toggle.setAttribute("aria-label", expanded ? "Close menu" : "Open menu");
+      iconOpen.classList.toggle("hidden", expanded);
+      iconClose.classList.toggle("hidden", !expanded);
+    });
+  }
+</script>

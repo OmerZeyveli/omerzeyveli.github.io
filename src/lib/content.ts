@@ -35,3 +35,13 @@ export async function getFeaturedWriting() {
   const posts = await getWritingPosts();
   return posts.filter((post) => post.data.featured);
 }
+
+export async function getLatestWriting(count = 3) {
+  const posts = await getWritingPosts();
+  return posts.slice(0, count);
+}
+
+export async function getLatestReviews(count = 3) {
+  const reviews = await getReviews();
+  return reviews.slice(0, count);
+}

@@ -1,0 +1,20 @@
+---
+import { siteConfig } from "../../config/site";
+---
+
+<footer class="border-t border-zinc-800/80 py-8">
+  <div
+    class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-sm text-zinc-500 sm:flex-row"
+  >
+    <p>&copy; {new Date().getFullYear()} {siteConfig.name}</p>
+    <nav aria-label="Footer navigation" class="flex gap-4">
+      {
+        siteConfig.nav.map((item) => (
+          <a href={item.href} class="transition-colors hover:text-zinc-300">
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</footer>

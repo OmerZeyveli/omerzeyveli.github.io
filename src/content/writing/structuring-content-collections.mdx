@@ -1,0 +1,42 @@
+---
+title: "Structuring Content Collections in Astro"
+description: "How typed content collections keep a growing site consistent and maintainable."
+pubDate: 2026-03-12
+category: "breakdown"
+tags: ["astro", "architecture", "content"]
+cover: ../../assets/content/writing/structuring-content-collections-cover.png
+coverAlt: "Dark abstract cover representing structured content architecture"
+featured: false
+draft: false
+---
+
+import Figure from "../../components/content/Figure.astro";
+import schemaOverview from "../../assets/content/writing/structuring-content-collections-inline.png";
+
+One of the first decisions when building a content-heavy static site is how to organize the content itself. Not just where files live on disk, but how the data is shaped, validated, and queried.
+
+Astro's content collections solve this well. They let you define schemas with Zod, which means every entry is validated at build time. If a required field is missing or a value is the wrong type, you find out before the site ships.
+
+## Why schemas matter early
+
+Without schemas, content tends to drift. A field gets renamed in one entry but not another. Dates are sometimes strings, sometimes actual dates. Cover images are optional in some entries and required in others.
+
+Defining strict schemas early prevents all of this. It also makes querying predictable — you never have to check whether a field exists before using it.
+
+## A practical structure
+
+For this site, content is organized into three collections: projects, writing, and reviews. Each has its own schema, its own asset folder, and its own set of required fields.
+
+<Figure
+  src={schemaOverview}
+  alt="Diagram showing the relationship between content collections and their schemas"
+  caption="Each collection enforces a strict schema at build time."
+/>
+
+The key fields shared across all collections are `title`, `pubDate`, `cover`, and `coverAlt`. Beyond that, each collection adds what it needs — projects include `stack` and `status`, writing includes `category` and `draft`, reviews include `type` and `score`.
+
+## Keeping queries centralized
+
+Rather than writing inline `getCollection()` calls with sorting and filtering logic on every page, shared helper functions handle the common patterns. This makes it easy to ensure that drafts are always filtered and entries are always sorted by date.
+
+The result is a codebase where adding a new entry means creating a file, filling out frontmatter, and trusting that the system catches mistakes automatically.

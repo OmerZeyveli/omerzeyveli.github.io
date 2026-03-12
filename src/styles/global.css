@@ -9,6 +9,21 @@ html {
   scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -23,4 +38,110 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+/* Focus-visible styles for keyboard accessibility */
+:focus-visible {
+  outline: 2px solid #a1a1aa;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip-to-content link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background: #f4f4f5;
+  color: #09090b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* Prose typography refinements for detail pages */
+.prose {
+  --tw-prose-body: #d4d4d8;
+  --tw-prose-headings: #f4f4f5;
+  --tw-prose-links: #f4f4f5;
+  --tw-prose-bold: #f4f4f5;
+  --tw-prose-code: #e4e4e7;
+  --tw-prose-quotes: #a1a1aa;
+  --tw-prose-quote-borders: #3f3f46;
+  --tw-prose-counters: #71717a;
+  --tw-prose-bullets: #52525b;
+  --tw-prose-hr: #27272a;
+  --tw-prose-captions: #71717a;
+  --tw-prose-pre-bg: #18181b;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+}
+
+@media (max-width: 640px) {
+  .prose {
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+}
+
+.prose :where(h2):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  margin-top: 2.5em;
+}
+
+.prose :where(p):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  text-underline-offset: 3px;
+  text-decoration: underline;
+  text-decoration-color: #52525b;
+  transition: text-decoration-color 0.15s;
+}
+
+.prose
+  :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)):hover {
+  text-decoration-color: #a1a1aa;
+}
+
+.prose
+  :where(a):not(
+    :where([class~="not-prose"], [class~="not-prose"] *)
+  ):focus-visible {
+  outline-offset: 3px;
+}
+
+.prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border: 1px solid #27272a;
+  border-radius: 1rem;
+}
+
+@media (max-width: 640px) {
+  .prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+    border-radius: 0.75rem;
+  }
+}
+
+.prose
+  :where(blockquote):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-left-width: 2px;
+  font-style: normal;
+}
+
+.prose
+  :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)):not(
+    pre code
+  ) {
+  background: #27272a;
+  padding: 0.15em 0.4em;
+  border-radius: 0.375rem;
+  font-size: 0.875em;
 }

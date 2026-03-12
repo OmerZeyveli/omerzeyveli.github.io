@@ -15,6 +15,7 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
+const { year, status, category, stack, repoUrl, liveUrl } = project.data;
 ---
 
 <PostLayout
@@ -24,5 +25,48 @@ const { Content } = await render(project);
   cover={project.data.cover}
   coverAlt={project.data.coverAlt}
 >
+  <div slot="meta" class="flex flex-wrap items-center gap-2 text-sm sm:gap-3">
+    <span class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300">
+      {category}
+    </span>
+    <span class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300">
+      {year}
+    </span>
+    <span class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300">
+      {status}
+    </span>
+    {
+      stack.map((item) => (
+        <span class="rounded-full border border-zinc-800 px-3 py-1 text-zinc-400">
+          {item}
+        </span>
+      ))
+    }
+    {
+      repoUrl && (
+        <a
+          href={repoUrl}
+          class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300 transition-colors hover:bg-zinc-800"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Repository ↗
+        </a>
+      )
+    }
+    {
+      liveUrl && (
+        <a
+          href={liveUrl}
+          class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300 transition-colors hover:bg-zinc-800"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Live Site ↗
+        </a>
+      )
+    }
+  </div>
+
   <Content components={{ Figure, YouTubeEmbed }} />
 </PostLayout>

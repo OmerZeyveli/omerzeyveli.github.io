@@ -1,7 +1,9 @@
 import { defineCollection } from "astro:content";
+import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
 const writing = defineCollection({
+  loader: glob({ pattern: "**/*.mdx", base: "./src/content/writing" }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
@@ -18,6 +20,7 @@ const writing = defineCollection({
 });
 
 const projects = defineCollection({
+  loader: glob({ pattern: "**/*.mdx", base: "./src/content/projects" }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
@@ -26,16 +29,17 @@ const projects = defineCollection({
       year: z.number().int(),
       status: z.enum(["planned", "in-progress", "completed"]),
       category: z.enum(["web", "game", "tool", "experimental", "other"]),
-      stack: z.array(z.string()).default([]),
+      stack: z.array(z.string()),
       cover: image(),
       coverAlt: z.string(),
       featured: z.boolean().default(false),
-      repoUrl: z.url().optional(),
-      liveUrl: z.url().optional(),
+      repoUrl: z.string().url().optional(),
+      liveUrl: z.string().url().optional(),
     }),
 });
 
 const reviews = defineCollection({
+  loader: glob({ pattern: "**/*.mdx", base: "./src/content/reviews" }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),

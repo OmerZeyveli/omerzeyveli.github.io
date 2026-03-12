@@ -1,0 +1,61 @@
+---
+title: "Task Flow"
+summary: "A minimal project management tool built around keyboard-first interaction and clear visual hierarchy."
+pubDate: 2026-02-15
+year: 2026
+status: "completed"
+category: "tool"
+stack: ["React", "TypeScript", "Tailwind CSS", "Zustand"]
+cover: ../../assets/content/projects/task-flow-cover.png
+coverAlt: "Task Flow application interface showing a dark-themed project board"
+featured: false
+repoUrl: "https://github.com/OmerZeyveli/task-flow"
+---
+
+import Figure from "../../components/content/Figure.astro";
+import YouTubeEmbed from "../../components/content/YouTubeEmbed.astro";
+import boardView from "../../assets/content/projects/task-flow-board-view.png";
+
+## Overview
+
+Task Flow is a lightweight project management tool designed for individual developers who want something faster than a full-featured PM platform but more structured than a text file.
+
+The goal was to build a tool that stays out of the way — fast to open, fast to update, and easy to scan at a glance.
+
+## Goals
+
+The project started from a specific frustration: most task management tools are built for teams. They come with notifications, permissions, timelines, and integrations that add friction for solo use.
+
+Task Flow was built with three constraints:
+
+1. Everything should be reachable from the keyboard.
+2. The visual hierarchy should make status obvious without reading labels.
+3. State should persist locally without requiring an account.
+
+## Stack decisions
+
+React was the natural choice for the interactive UI. Zustand handles state management with minimal boilerplate — it avoids the ceremony of Redux while still making state predictable. Tailwind CSS keeps the styling fast and consistent.
+
+Local storage handles persistence. There is no backend and no authentication. Data stays in the browser.
+
+## Process
+
+The first version was a single-column list. It worked, but it was hard to see the full picture of a project. Moving to a board layout made the status of each task immediately visible.
+
+<Figure
+  src={boardView}
+  alt="Board view with columns for backlog, in progress, and done"
+  caption="The board layout gives a clear overview of task status at a glance."
+/>
+
+Keyboard navigation was added in the second iteration. Arrow keys move between tasks, Enter opens the editor, and Escape closes it. This made the tool significantly faster to use in practice.
+
+## Tradeoffs
+
+Keeping everything client-side means there is no sync across devices. This was an intentional decision — adding a backend would have increased complexity well beyond the scope of the project. For a solo tool used on one machine, local persistence is enough.
+
+The board layout also limits how many tasks can be visible at once. For large projects, a list or table view would be more practical. For now, the board works well within its intended scope.
+
+## Outcome
+
+Task Flow is a finished tool that does what it set out to do. It loads instantly, requires no setup, and stays fast even with dozens of tasks. The keyboard-first design makes it genuinely pleasant to use during focused work sessions.

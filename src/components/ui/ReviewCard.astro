@@ -1,0 +1,52 @@
+---
+import { Image } from "astro:assets";
+
+interface Props {
+  href: string;
+  cover: ImageMetadata;
+  coverAlt: string;
+  title: string;
+  description: string;
+  type: string;
+  score?: number;
+  headingLevel?: "h2" | "h3";
+  sizes?: string;
+}
+
+const {
+  href,
+  cover,
+  coverAlt,
+  title,
+  description,
+  type,
+  score,
+  headingLevel = "h2",
+  sizes = "(max-width: 768px) 100vw, 50vw",
+} = Astro.props;
+
+const Heading = headingLevel;
+---
+
+<a
+  href={href}
+  class="block overflow-hidden rounded-2xl border border-zinc-800 transition hover:bg-zinc-900/60 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 sm:rounded-[1.75rem]"
+>
+  <Image
+    src={cover}
+    alt={coverAlt}
+    class="aspect-[16/10] w-full object-cover"
+    widths={[600, 900, 1200]}
+    sizes={sizes}
+  />
+
+  <div class="space-y-3 p-4 sm:p-5">
+    <div class="flex items-center justify-between gap-4 text-sm text-zinc-500">
+      <span>{type}</span>
+      {score != null && <span>{score}/10</span>}
+    </div>
+
+    <Heading class="text-lg font-medium">{title}</Heading>
+    <p class="text-sm leading-6 text-zinc-400">{description}</p>
+  </div>
+</a>

@@ -7,7 +7,9 @@ interface Props {
 const { id, title } = Astro.props;
 ---
 
-<div class="my-8 overflow-hidden rounded-3xl border border-zinc-800">
+<div
+  class="my-8 overflow-hidden rounded-2xl border border-zinc-800 sm:rounded-3xl"
+>
   <div class="aspect-video">
     <iframe
       class="h-full w-full"

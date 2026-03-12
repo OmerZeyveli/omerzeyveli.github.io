@@ -7,28 +7,62 @@ import { siteConfig } from "../config/site";
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
+  imageAlt?: string;
 }
 
-const { title = siteConfig.title, description = siteConfig.description } =
-  Astro.props;
+const {
+  title = siteConfig.title,
+  description = siteConfig.description,
+  image,
+  imageAlt,
+} = Astro.props;
 
 const pageTitle =
   title === siteConfig.title
     ? siteConfig.title
     : `${title} | ${siteConfig.title}`;
+
+const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).href;
 ---
 
 <!doctype html>
-<html lang="tr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
     <title>{pageTitle}</title>
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content={siteConfig.name} />
+    <meta property="og:locale" content={siteConfig.locale} />
+    {image && <meta property="og:image" content={image} />}
+    {imageAlt && <meta property="og:image:alt" content={imageAlt} />}
+
+    <!-- Twitter -->
+    <meta
+      name="twitter:card"
+      content={image ? "summary_large_image" : "summary"}
+    />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    {image && <meta name="twitter:image" content={image} />}
+    {imageAlt && <meta name="twitter:image:alt" content={imageAlt} />}
   </head>
   <body class="bg-zinc-950 text-zinc-100 antialiased">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <SiteHeader />
-    <main class="mx-auto min-h-[calc(100vh-140px)] max-w-6xl px-6 py-10">
+    <main
+      id="main-content"
+      class="mx-auto min-h-[calc(100vh-140px)] max-w-6xl px-4 py-8 sm:px-6 sm:py-10"
+    >
       <slot />
     </main>
     <SiteFooter />
