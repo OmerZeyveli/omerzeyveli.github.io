@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import { Image } from "astro:assets";
+import { formatDate } from "../lib/date";
 
 interface Props {
   title: string;
@@ -13,12 +14,6 @@ interface Props {
 
 const { title, description, pubDate, updatedDate, cover, coverAlt } =
   Astro.props;
-
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
 
 const siteUrl = Astro.site ?? new URL(Astro.url.origin);
 const ogImage = cover ? new URL(cover.src, siteUrl).href : undefined;
@@ -49,13 +44,13 @@ const ogImage = cover ? new URL(cover.src, siteUrl).href : undefined;
           pubDate && (
             <div class="flex flex-wrap items-center gap-x-3 text-sm text-zinc-500">
               <time datetime={pubDate.toISOString()}>
-                {dateFormatter.format(pubDate)}
+                {formatDate(pubDate)}
               </time>
               {updatedDate && (
                 <span>
                   · Updated{" "}
                   <time datetime={updatedDate.toISOString()}>
-                    {dateFormatter.format(updatedDate)}
+                    {formatDate(updatedDate)}
                   </time>
                 </span>
               )}

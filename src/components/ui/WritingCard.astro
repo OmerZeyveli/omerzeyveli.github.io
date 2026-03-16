@@ -1,5 +1,6 @@
 ---
 import { Image } from "astro:assets";
+import { formatDate } from "../../lib/date";
 
 interface Props {
   href: string;
@@ -43,7 +44,7 @@ const Heading = headingLevel;
   <div class="space-y-3 p-4 sm:p-5">
     <div class="flex items-center justify-between gap-4 text-sm text-zinc-500">
       <span>{category}</span>
-      <span>{pubDate.toLocaleDateString("en-US")}</span>
+      <span>{formatDate(pubDate)}</span>
     </div>
 
     <Heading class="text-lg font-medium">{title}</Heading>
