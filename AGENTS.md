@@ -207,7 +207,8 @@ Optional:
 
 ### Schema rules
 
-- URLs must use `z.string().url()`.
+- URLs must use an explicit URL validator.
+- Prefer `z.url()` on current Astro/Zod versions. `z.string().url()` is acceptable when compatibility requires it.
 - Cover images should use Astro image schema support.
 - All entries must have meaningful alt text.
 - Keep schema strict and explicit.
@@ -245,6 +246,7 @@ If filtering is done after retrieval, the public result must still exclude draft
 - Keep query logic centralized where possible.
 - Do not duplicate sorting/filtering logic across many pages without reason.
 - Prefer helper functions over repeated inline collection handling.
+- When only top N entries are needed (for example latest or featured sections), helper functions may use partial selection instead of fully sorting the entire collection.
 
 ---
 

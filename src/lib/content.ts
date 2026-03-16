@@ -8,6 +8,7 @@ function sortByPubDateDesc<T extends DatedEntry>(entries: T[]) {
   );
 }
 
+// Keep only the latest N items without sorting the entire array.
 function selectLatestByPubDate<T extends DatedEntry>(
   entries: T[],
   count: number,

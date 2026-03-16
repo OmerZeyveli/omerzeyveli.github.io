@@ -671,6 +671,7 @@ Content query behavior must stay explicit and predictable.
 - use shared helpers in `src/lib/content.ts` when possible
 - sort collection entries by `pubDate` descending unless there is a strong reason not to
 - keep filtering logic close to the data layer instead of duplicating it in every page
+- when only top N entries are needed, helpers may use partial selection instead of fully sorting the entire collection
 
 ### Draft filtering rule
 
@@ -694,7 +695,7 @@ Examples:
 - numbers: `z.number()`
 - booleans: `z.boolean()`
 - arrays: `z.array(z.string())`
-- URLs: `z.string().url()`
+- URLs: `z.url()` (preferred) or `z.string().url()` when compatibility requires it
 
 Do not describe schema fields vaguely in implementation code. Use explicit Zod validators.
 
