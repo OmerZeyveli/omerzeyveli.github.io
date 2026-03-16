@@ -23,7 +23,8 @@ const pageTitle =
     ? siteConfig.title
     : `${title} | ${siteConfig.title}`;
 
-const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).href;
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
 ---
 
 <!doctype html>

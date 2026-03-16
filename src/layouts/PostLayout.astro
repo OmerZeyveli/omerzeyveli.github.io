@@ -1,7 +1,6 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import { Image } from "astro:assets";
-import { siteConfig } from "../config/site";
 
 interface Props {
   title: string;
@@ -21,7 +20,8 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
 });
 
-const ogImage = cover ? new URL(cover.src, siteConfig.url).href : undefined;
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const ogImage = cover ? new URL(cover.src, siteUrl).href : undefined;
 ---
 
 <BaseLayout

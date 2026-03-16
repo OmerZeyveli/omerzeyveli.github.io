@@ -3,7 +3,6 @@ export const siteConfig = {
   title: "Riive",
   description:
     "Developer portfolio, project case studies, reviews, and writing.",
-  url: "https://omerzeyveli.com",
   locale: "en-US",
   nav: [
     { href: "/", label: "Home" },
