@@ -228,13 +228,13 @@ personal-site/
 │  │  ├─ 404.astro
 │  │  ├─ projects/
 │  │  │  ├─ index.astro
-│  │  │  └─ [slug].astro
+│  │  │  └─ [...slug].astro
 │  │  ├─ reviews/
 │  │  │  ├─ index.astro
-│  │  │  └─ [slug].astro
+│  │  │  └─ [...slug].astro
 │  │  └─ writing/
 │  │     ├─ index.astro
-│  │     └─ [slug].astro
+│  │     └─ [...slug].astro
 │  ├─ styles/
 │  │  └─ global.css
 │  └─ content.config.ts
@@ -262,7 +262,7 @@ Examples:
 
 - `index.astro` renders the home page
 - `projects/index.astro` renders the projects listing page
-- `projects/[slug].astro` renders each project detail page
+- `projects/[...slug].astro` renders each project detail page
 
 ### `src/content/`
 
@@ -1011,7 +1011,8 @@ URL behavior must stay stable unless there is a strong reason to change it.
 
 - `src/pages/` owns route generation.
 - `src/content/` owns entry content.
-- Collection detail pages must use dynamic `[slug].astro` routes.
+- Collection detail pages must use catch-all `[...slug].astro` routes.
+- Catch-all detail routes support nested content paths while preserving canonical single-segment URLs.
 - `render(entry)` should be used for collection detail page rendering.
 
 ### Public naming rules

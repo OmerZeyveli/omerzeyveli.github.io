@@ -73,6 +73,10 @@ Canonical routes:
 - `/about`
 - `/404`
 
+Implementation note:
+
+- Detail route files should use catch-all patterns (`[...slug].astro`) so nested content paths are supported while canonical single-segment URLs continue to work.
+
 ### Content
 
 All content entries live in:
