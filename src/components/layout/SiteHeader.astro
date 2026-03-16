@@ -2,6 +2,14 @@
 import { siteConfig } from "../../config/site";
 
 const currentPath = Astro.url.pathname;
+
+function isNavItemActive(current: string, href: string): boolean {
+  if (href === "/") {
+    return current === "/";
+  }
+
+  return current === href || current.startsWith(`${href}/`);
+}
 ---
 
 <header
@@ -22,9 +30,7 @@ const currentPath = Astro.url.pathname;
     >
       {
         siteConfig.nav.map((item) => {
-          const isActive =
-            currentPath === item.href ||
-            (item.href !== "/" && currentPath.startsWith(item.href));
+          const isActive = isNavItemActive(currentPath, item.href);
           return (
             <a
               href={item.href}
@@ -90,9 +96,7 @@ const currentPath = Astro.url.pathname;
     <div class="mx-auto max-w-6xl space-y-1 px-6 py-4">
       {
         siteConfig.nav.map((item) => {
-          const isActive =
-            currentPath === item.href ||
-            (item.href !== "/" && currentPath.startsWith(item.href));
+          const isActive = isNavItemActive(currentPath, item.href);
           return (
             <a
               href={item.href}
