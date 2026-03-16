@@ -33,8 +33,8 @@ const projects = defineCollection({
       cover: image(),
       coverAlt: z.string(),
       featured: z.boolean().default(false),
-      repoUrl: z.string().url().optional(),
-      liveUrl: z.string().url().optional(),
+      repoUrl: z.url().optional(),
+      liveUrl: z.url().optional(),
     }),
 });
 
