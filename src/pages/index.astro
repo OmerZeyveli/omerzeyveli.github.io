@@ -11,7 +11,7 @@ import {
   getLatestReviews,
 } from "../lib/content";
 
-const featuredProjects = (await getFeaturedProjects()).slice(0, 3);
+const featuredProjects = await getFeaturedProjects(3);
 const latestWriting = await getLatestWriting(3);
 const latestReviews = await getLatestReviews(3);
 ---
