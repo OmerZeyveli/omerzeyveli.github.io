@@ -31,7 +31,7 @@ const Heading = headingLevel;
 
 <a
   href={href}
-  class="block overflow-hidden rounded-2xl border border-zinc-800 transition hover:bg-zinc-900/60 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 sm:rounded-[1.75rem]"
+  class="flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-800 transition hover:bg-zinc-900/60 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 sm:rounded-[1.75rem]"
 >
   <Image
     src={cover}
@@ -41,13 +41,17 @@ const Heading = headingLevel;
     sizes={sizes}
   />
 
-  <div class="space-y-3 p-4 sm:p-5">
+  <div class="flex flex-1 flex-col gap-3 p-4 sm:p-5">
     <div class="flex items-center justify-between gap-4 text-sm text-zinc-500">
       <span>{category}</span>
       <span>{formatDate(pubDate)}</span>
     </div>
 
-    <Heading class="text-lg font-medium">{title}</Heading>
-    <p class="text-sm leading-6 text-zinc-400">{description}</p>
+    <Heading class="card-title-clamp text-lg leading-7 font-medium"
+      >{title}</Heading
+    >
+    <p class="card-summary-clamp text-sm leading-6 text-zinc-400">
+      {description}
+    </p>
   </div>
 </a>
