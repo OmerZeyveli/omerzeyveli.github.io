@@ -5,7 +5,10 @@ import Figure from "../../components/content/Figure.astro";
 import YouTubeEmbed from "../../components/content/YouTubeEmbed.astro";
 
 export async function getStaticPaths() {
-  const projects = await getCollection("projects");
+  const projects = await getCollection(
+    "projects",
+    ({ data }) => !data.archived,
+  );
 
   return projects.map((project) => ({
     params: { slug: project.id },

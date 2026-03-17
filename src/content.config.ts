@@ -16,6 +16,7 @@ const writing = defineCollection({
       coverAlt: z.string(),
       featured: z.boolean().default(false),
       draft: z.boolean().default(false),
+      archived: z.boolean().default(false),
     }),
 });
 
@@ -35,6 +36,7 @@ const projects = defineCollection({
       featured: z.boolean().default(false),
       repoUrl: z.url().optional(),
       liveUrl: z.url().optional(),
+      archived: z.boolean().default(false),
     }),
 });
 
@@ -54,6 +56,7 @@ const reviews = defineCollection({
       cover: image(),
       coverAlt: z.string(),
       featured: z.boolean().default(false),
+      archived: z.boolean().default(false),
     }),
 });
 

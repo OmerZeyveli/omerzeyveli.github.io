@@ -374,6 +374,7 @@ Typical fields:
 - `coverAlt`
 - `featured`
 - `draft`
+- `archived`
 
 #### Projects
 
@@ -391,6 +392,7 @@ Typical fields:
 - `featured`
 - `repoUrl`
 - `liveUrl`
+- `archived`
 
 #### Reviews
 
@@ -408,6 +410,7 @@ Typical fields:
 - `cover`
 - `coverAlt`
 - `featured`
+- `archived`
 
 ---
 
@@ -685,6 +688,23 @@ const posts = await getCollection("writing", ({ data }) => !data.draft);
 
 If filtering is done after retrieval, the behavior must remain equivalent.
 
+### Archive filtering rule
+
+Archive filtering must be applied intentionally for all collections used on public pages.
+
+Example pattern:
+
+```ts
+const projects = await getCollection("projects", ({ data }) => !data.archived);
+const posts = await getCollection(
+  "writing",
+  ({ data }) => !data.draft && !data.archived,
+);
+const reviews = await getCollection("reviews", ({ data }) => !data.archived);
+```
+
+Archived entries must not appear in archive pages, home-page sections, or generated detail routes.
+
 ### Schema rule
 
 Collection schemas must use `z` from `astro/zod`.
@@ -914,6 +934,7 @@ The following content rules are not suggestions. They are the default contract f
 - Content files must live inside `src/content/<collection>/`.
 - Content assets should live inside `src/assets/content/<collection>/`.
 - Draft content must not appear on public listing pages.
+- Archived content must not appear on public listing pages, home sections, or generated detail routes.
 
 ### Writing collection contract
 
@@ -932,6 +953,7 @@ Optional fields:
 - `tags: string[]`
 - `featured: boolean`
 - `draft: boolean`
+- `archived: boolean`
 
 ### Projects collection contract
 
@@ -952,6 +974,7 @@ Optional fields:
 - `featured: boolean`
 - `repoUrl: url`
 - `liveUrl: url`
+- `archived: boolean`
 
 ### Reviews collection contract
 
@@ -972,6 +995,7 @@ Optional fields:
 - `score: number`
 - `tags: string[]`
 - `featured: boolean`
+- `archived: boolean`
 
 ### Collection behavior rules
 
@@ -979,6 +1003,7 @@ Optional fields:
 - Home page sections also prefer `pubDate` descending.
 - `featured: true` is used only for curated highlights.
 - `draft: true` is currently only supported for Writing entries.
+- `archived: true` excludes entries from public listing pages, home sections, and generated detail routes.
 - Scores in Reviews use a **10-point scale**.
 
 ---
@@ -1426,6 +1451,7 @@ cover: ../../assets/content/writing/your-writing-title/cover.jpg
 coverAlt: "Describe the cover image clearly"
 featured: false
 draft: false
+archived: false
 ---
 
 import Figure from "../../components/content/Figure.astro";
@@ -1461,6 +1487,7 @@ coverAlt: "Describe the project cover image clearly"
 featured: false
 repoUrl: "https://github.com/your-name/project-name"
 liveUrl: "https://project.example.com"
+archived: false
 ---
 
 import Figure from "../../components/content/Figure.astro";
@@ -1512,6 +1539,7 @@ tags: ["action", "indie"]
 cover: ../../assets/content/reviews/review-title/cover.jpg
 coverAlt: "Describe the review cover image clearly"
 featured: false
+archived: false
 ---
 
 import Figure from "../../components/content/Figure.astro";

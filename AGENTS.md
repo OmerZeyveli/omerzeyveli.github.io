@@ -170,6 +170,7 @@ Optional:
 - `tags`
 - `featured`
 - `draft`
+- `archived`
 
 ### Projects schema expectations
 
@@ -190,6 +191,7 @@ Optional:
 - `featured`
 - `repoUrl`
 - `liveUrl`
+- `archived`
 
 ### Reviews schema expectations
 
@@ -210,6 +212,7 @@ Optional:
 - `score`
 - `tags`
 - `featured`
+- `archived`
 
 ### Schema rules
 
@@ -246,6 +249,14 @@ const posts = await getCollection("writing", ({ data }) => !data.draft);
 ```
 
 If filtering is done after retrieval, the public result must still exclude drafts.
+
+### Archive filtering
+
+Archived entries must not appear publicly.
+
+When querying Projects, Writing, or Reviews for public pages, explicitly exclude `archived: true` entries.
+
+If filtering is done after retrieval, the public result must still exclude archived entries from listing pages, home sections, and generated detail routes.
 
 ### Query rules
 
