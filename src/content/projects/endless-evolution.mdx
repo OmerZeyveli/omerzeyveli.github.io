@@ -1,6 +1,6 @@
 ---
 title: "Endless Evolution"
-summary: "A puzzle-platformer that started as a 5-day game jam project and is now growing into our first commercial Steam release."
+summary: "A puzzle-platformer born in JamSepticeye 2025, now evolving into our first commercial Steam release with expanded biome design and rebuilt core systems."
 pubDate: 2026-03-17
 year: 2026
 status: "in-progress"
@@ -12,35 +12,97 @@ featured: true
 liveUrl: "https://store.steampowered.com/app/4121290/Endless_Evolution/"
 ---
 
+import Figure from "../../components/content/Figure.astro";
 import YouTubeEmbed from "../../components/content/YouTubeEmbed.astro";
+import jamGameplay from "../../assets/content/projects/endless-evolution/inline.png";
 
 ## Overview
 
-What started as a fun project with my crew is officially becoming our first commercial game.
+Endless Evolution was our third game jam project. I built it with three friends for JamSepticeye 2025, running from October 1, 2025 at 6:30 PM to October 6, 2025 at 8:00 AM.
 
-Endless Evolution is a puzzle-platformer where you play as a slime, absorb animal DNA, gain new abilities, and use them to progress.
+Out of 1,158 entries, we placed <b>#33</b> overall and <b>#18</b> in visuals. Huge credit to Jess for the art direction and asset quality that carried the game's identity.
 
-Watch the trailer on YouTube: [Endless Evolution Trailer](https://www.youtube.com/watch?v=gNwMo_rxAoc)
+The jam theme was <b>"Death is an opportunity"</b>. We interpreted that as a puzzle loop where failure is part of progress: the player, a slime, absorbs DNA from animal remnants and uses each form's ability to open new routes through a level.
+
+<Figure
+  src={jamGameplay}
+  alt="Gameplay from the original jam build showing slime-based puzzle platforming"
+  caption="Old jam build gameplay: DNA forms and environmental interactions were designed around iterative trial, death, and re-attempts."
+/>
+
+## Jam Core Loop
+
+The jam version shipped with 10 levels. In each level, the objective is to reach the finish flag while solving obstacle chains with the right DNA form.
+
+The central constraint was simple and intentional: one DNA use per life. The player would take a form, use its ability to change level state, die, respawn, and take another form to continue unlocking the route.
+
+That created a loop of:
+
+- choose a DNA form
+- use its ability to alter the puzzle state
+- reset through death
+- continue with a new form until the path is solved
+
+## DNA Set and Puzzle Design
+
+The jam build had 5 animal forms:
+
+- Ant slime: pushes heavy objects
+- Fish slime: swims through water while other forms drown
+- Butterfly slime: flies through vertical spaces
+- Bunny slime: high jump and wall jump mobility
+- Goat slime: charge attack to break wooden doors and boxes
+
+Most puzzle rooms combined forms with doors, buttons, and traversal timing. We also spent a lot of our jam time on audiovisual feedback so actions felt readable, even when puzzle states got complex.
+
+## Scope Decisions Under Jam Constraints
+
+Because this was our third jam and only four full development days, we chose to build on what we already knew from our previous platformer instead of reinventing core movement from scratch.
+
+That decision gave us room to focus on ability interactions, level pacing, and visual polish while still delivering 10 levels in the deadline window.
+
+The build had bugs, but the core idea landed well and gave us strong validation to continue beyond the jam.
+
+## Trailer
+
+Watch the original trailer on YouTube: [Endless Evolution Trailer](https://www.youtube.com/watch?v=gNwMo_rxAoc)
 
 <YouTubeEmbed id="gNwMo_rxAoc" title="Endless Evolution Official Trailer" />
 
-## The Origin
+## Post-Jam Development and Rebuild
 
-We originally built the game for JamSepticeye 2025. It was an intense 5-day marathon, and the results out of 1,158 entries gave us real momentum to keep going:
+After the jam, we fixed the most critical issues and reviewed player feedback. The clearest design problem was jump responsiveness: several forms could not jump in ways that felt good moment-to-moment.
 
-- Visuals: #18 (Thank you Jess!)
-- Overall: #33
+In the current commercial branch, every slime can jump, but jump strength is still tuned per form for level design control. This preserved puzzle constraints while making base movement feel much more responsive.
 
-## What's New?
+From there, we expanded the game structure into biome-based progression. We are currently near completion of the first biome, <b>Jungle</b>, which will be the focus of the next public demo update.
 
-The jam version was just the beginning. We are now scaling the game, adding new mechanics, and expanding the world toward a full release.
+## Current Biome Direction (Jungle)
 
-The goal is to take that initial jam spark and turn it into a deeper, more polished experience.
+The newer build includes 6 abilities in this biome:
+
+- Ant and Fish remain from the jam version
+- Monkey can climb walls and swing on ropes
+- Frog can high jump and use its tongue to hit targets
+- Hummingbird can slow perceived world time
+- Chameleon can camouflage to avoid enemy detection
+
+We also introduced enemy pressure and hazard layering, including melee and ranged monkey enemies, mosquitoes, spike setups, and carnivorous plant traps.
+
+## Systems Rewrite
+
+We rebuilt large parts of the codebase to support long-term development:
+
+- reworked ability architecture so one shared input triggers form-specific behavior through interface-based methods
+- each form now owns its own ability implementation (including the default slime)
+- improved menu usability with keyboard traversal support
+- replaced the save pipeline with a version-tolerant system designed to keep older save files compatible
+- expanded interaction verbs with levers in addition to buttons
 
 ## Try the Demo
 
-We just dropped a Steam Demo so you can see the progress for yourself. I will keep updating this page as development continues.
+The current Steam page hosts our existing demo, and the upcoming Jungle demo update will reflect the new biome direction and systems work.
 
-Try it on Steam: [Endless Evolution Demo](https://store.steampowered.com/app/4121290/Endless_Evolution/)
+You can play it here: [Endless Evolution on Steam](https://store.steampowered.com/app/4121290/Endless_Evolution/)
 
-Thanks for reading and following our journey.
+I will keep updating this page as development progresses toward full release.
