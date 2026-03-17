@@ -93,6 +93,8 @@ Collection-specific assets live in:
 - `src/assets/content/writing/`
 - `src/assets/content/reviews/`
 
+Inside each collection folder, use one slug-based folder per entry.
+
 ### Components
 
 Use these conventions:
@@ -359,6 +361,7 @@ Media is part of the content strategy, not decoration.
 ### Asset rules
 
 - Keep assets inside the correct collection folder.
+- Keep each entry's assets in its own slug-based subfolder.
 - Use descriptive names.
 - Prefer local assets over external hotlinked media.
 

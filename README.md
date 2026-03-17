@@ -642,7 +642,7 @@ pnpm format
 
 1. Create a new `.mdx` file in `src/content/writing/`
 2. Add the required frontmatter fields
-3. Add a cover image from `src/assets/content/writing/`
+3. Add a cover image in an entry-specific folder like `src/assets/content/writing/<entry-slug>/`
 4. Write the content
 5. Optionally embed figures or a YouTube video
 
@@ -1215,6 +1215,7 @@ Rules:
 ### Asset organization rules
 
 - keep assets grouped by collection
+- keep each entry's media in its own slug-based subfolder
 - use descriptive file names
 - avoid dumping unrelated media into shared folders
 
@@ -1421,7 +1422,7 @@ pubDate: 2026-03-11
 updatedDate: 2026-03-11
 category: "note"
 tags: ["tag-one", "tag-two"]
-cover: ../../assets/content/writing/your-cover.jpg
+cover: ../../assets/content/writing/your-writing-title/cover.jpg
 coverAlt: "Describe the cover image clearly"
 featured: false
 draft: false
@@ -1429,7 +1430,7 @@ draft: false
 
 import Figure from "../../components/content/Figure.astro";
 import YouTubeEmbed from "../../components/content/YouTubeEmbed.astro";
-import sampleImage from "../../assets/content/writing/your-inline-image.jpg";
+import sampleImage from "../../assets/content/writing/your-writing-title/inline-01.jpg";
 
 Start with a strong opening paragraph.
 
@@ -1455,7 +1456,7 @@ year: 2026
 status: "in-progress"
 category: "web"
 stack: ["Astro", "React", "Tailwind", "TypeScript"]
-cover: ../../assets/content/projects/project-cover.jpg
+cover: ../../assets/content/projects/project-name/cover.jpg
 coverAlt: "Describe the project cover image clearly"
 featured: false
 repoUrl: "https://github.com/your-name/project-name"
@@ -1464,7 +1465,7 @@ liveUrl: "https://project.example.com"
 
 import Figure from "../../components/content/Figure.astro";
 import YouTubeEmbed from "../../components/content/YouTubeEmbed.astro";
-import screenshotOne from "../../assets/content/projects/project-screen-01.jpg";
+import screenshotOne from "../../assets/content/projects/project-name/screen-01.jpg";
 
 ## Overview
 
@@ -1508,14 +1509,14 @@ releaseYear: 2026
 status: "finished"
 score: 8.4
 tags: ["action", "indie"]
-cover: ../../assets/content/reviews/review-cover.jpg
+cover: ../../assets/content/reviews/review-title/cover.jpg
 coverAlt: "Describe the review cover image clearly"
 featured: false
 ---
 
 import Figure from "../../components/content/Figure.astro";
 import YouTubeEmbed from "../../components/content/YouTubeEmbed.astro";
-import stillOne from "../../assets/content/reviews/review-still-01.jpg";
+import stillOne from "../../assets/content/reviews/review-title/still-01.jpg";
 
 ## Quick Verdict
 
