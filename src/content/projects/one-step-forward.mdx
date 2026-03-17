@@ -1,0 +1,105 @@
+---
+title: "One Step Forward"
+summary: "A narrative platformer built for Shovel Jam 2025, focused on emotional friction and movement-heavy level design under game jam constraints."
+pubDate: 2026-03-17
+year: 2025
+status: "completed"
+category: "game"
+stack: ["Game Design", "Unity"]
+cover: ../../assets/content/projects/one-step-forward/cover.png
+coverAlt: "One Step Forward title card with a hand-drawn platforming scene"
+featured: true
+liveUrl: "https://riive.itch.io/one-step-forward"
+---
+
+import Figure from "../../components/content/Figure.astro";
+import perfectionismLevel from "../../assets/content/projects/one-step-forward/perfectionism.png";
+import distractionsLevel from "../../assets/content/projects/one-step-forward/distractions.png";
+import overthinkingLevel from "../../assets/content/projects/one-step-forward/overthinking.png";
+import fearOfFailureLevel from "../../assets/content/projects/one-step-forward/fear-of-failiure.png";
+
+## Overview
+
+One Step Forward was my second game jam project. I built it with three friends for Shovel Jam 2025, running from July 12 to July 21.
+
+Out of 1,147 entries, we placed <b>#34</b> overall.
+
+The theme was <b>"Just get started"</b>. We interpreted that as progress through internal resistance, then built four platforming levels around four emotional blockers: Perfectionism, Distractions, Overthinking, and Fear of Failure.
+
+## Core Loop
+
+The game is a 2D platformer with four short levels. Every level shares the same movement foundation, but each one introduces a different obstacle pattern and framing mechanic.
+
+The player objective is simple: move through the level and reach the finish. Under that simple goal, the design tries to connect movement pressure with emotional themes instead of relying on dialogue-heavy exposition.
+
+## Technical Build
+
+Because this was our second jam, we intentionally aimed bigger than our first project. Moving from top-down gameplay to a movement-heavy platformer raised implementation complexity fast.
+
+Beyond left-right-jump basics, we needed dash directions, wall slide behavior, wall jumps, and cleaner animation transitions. To keep the code manageable, we built a locomotion state pattern and reused the same state pattern for animation handling.
+
+A typical state controlled enter/tick/exit behavior, which let us coordinate movement logic and effects in one place, including dash particles and animation clips. We also added observer-style event handling where useful to reduce hard references between systems.
+
+With a 9.5-day schedule, we still made room for game feel polish: screen shake on key events, particles, and stronger audio feedback.
+
+## Level Breakdown
+
+### Perfectionism
+
+This level introduces the idea that "perfect execution" is not required. The main mechanic is a time-trail ghost that replays a perfect run, while the player still progresses with their own mistakes.
+
+<Figure
+  src={perfectionismLevel}
+  alt="Perfectionism level with light rays and beautiful white minimalist environment"
+  caption="Perfectionism frames pressure through comparison, using a ghost replay as a visual benchmark."
+/>
+
+### Distractions
+
+Distractions is built around optional paths, visual noise, and tempting side routes. The critical path is straightforward, but many spaces invite detours that do not help completion.
+
+<Figure
+  src={distractionsLevel}
+  alt="Distractions level with multiple side paths, props, and optional challenge rooms"
+  caption="The route is short, but level dressing and branches intentionally pull focus away from the goal."
+/>
+
+### Overthinking
+
+Overthinking provides multiple valid paths to the finish. Most routes work, so the player does not need to over-optimize every decision.
+
+<Figure
+  src={overthinkingLevel}
+  alt="Overthinking level with several parallel routes across floating platforms"
+  caption="Multiple successful routes reinforce the idea that progress matters more than perfect planning."
+/>
+
+### Fear of Failure
+
+This level is mostly dark except for local light sources. Torches act as both visibility tools and checkpoints. On death, a ghost replays the player path from checkpoint to failure, while also emitting light.
+
+That turns past mistakes into navigation help for the next attempt, making failure both pressure and guidance.
+
+<Figure
+  src={fearOfFailureLevel}
+  alt="Fear of Failure level in darkness with checkpoint lights and ghost replays"
+  caption="Past failures reappear as light-carrying ghosts, turning death data into actionable pathing support."
+/>
+
+## Key Mechanic: Time-Trail Ghost
+
+The ghost system records player positions frame-by-frame, then replays that path directly. This gave us a flexible replay mechanic without rebuilding full character simulation for AI clones.
+
+Because ghosts are visualized as hovering entities instead of full humanoid movement, we avoided expensive animation-state parity and kept implementation practical for jam scope.
+
+## Outcome and Lessons
+
+One Step Forward performed well for our second jam and gave me a much stronger development process than our first attempt.
+
+The biggest gains were architectural discipline and documentation quality. Using design patterns early prevented the movement code from collapsing into one large controller script, and that made iteration much faster during the jam.
+
+The clearest weakness was communication clarity in a few moments where narrative were conceptually strong but not always self-explanatory to players. That is the main improvement target for future projects.
+
+## Play the Game
+
+You can play One Step Forward on itch.io: [One Step Forward on itch.io](https://riive.itch.io/one-step-forward)
