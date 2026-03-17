@@ -13,6 +13,7 @@ liveUrl: "https://riive.itch.io/one-step-forward"
 ---
 
 import Figure from "../../components/content/Figure.astro";
+import menuBook from "../../assets/content/projects/one-step-forward/menu.png";
 import perfectionismLevel from "../../assets/content/projects/one-step-forward/perfectionism.png";
 import distractionsLevel from "../../assets/content/projects/one-step-forward/distractions.png";
 import overthinkingLevel from "../../assets/content/projects/one-step-forward/overthinking.png";
@@ -25,6 +26,12 @@ One Step Forward was my second game jam project. I built it with three friends f
 Out of 1,147 entries, we placed <b>#34</b> overall.
 
 The theme was <b>"Just get started"</b>. We interpreted that as progress through internal resistance, then built four platforming levels around four emotional blockers: Perfectionism, Distractions, Overthinking, and Fear of Failure.
+
+<Figure
+  src={menuBook}
+  alt="Book-style main menu showing chapter-like level selection and page-based navigation"
+  caption="The main menu is structured like a book, with level selection and navigation presented as pages."
+/>
 
 ## Core Loop
 
@@ -51,7 +58,7 @@ This level introduces the idea that "perfect execution" is not required. The mai
 <Figure
   src={perfectionismLevel}
   alt="Perfectionism level with light rays and beautiful white minimalist environment"
-  caption="Perfectionism frames pressure through comparison, using a ghost replay as a visual benchmark."
+  caption="Perfectionism pressure through comparison with the 'perfect' ghost in the next room."
 />
 
 ### Distractions
