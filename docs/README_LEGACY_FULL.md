@@ -228,13 +228,13 @@ personal-site/
 │  │  ├─ 404.astro
 │  │  ├─ projects/
 │  │  │  ├─ index.astro
-│  │  │  └─ [...slug].astro
+│  │  │  └─ [slug].astro
 │  │  ├─ reviews/
 │  │  │  ├─ index.astro
-│  │  │  └─ [...slug].astro
+│  │  │  └─ [slug].astro
 │  │  └─ writing/
 │  │     ├─ index.astro
-│  │     └─ [...slug].astro
+│  │     └─ [slug].astro
 │  ├─ styles/
 │  │  └─ global.css
 │  └─ content.config.ts
@@ -262,7 +262,7 @@ Examples:
 
 - `index.astro` renders the home page
 - `projects/index.astro` renders the projects listing page
-- `projects/[...slug].astro` renders each project detail page
+- `projects/[slug].astro` renders each project detail page
 
 ### `src/content/`
 
@@ -374,7 +374,6 @@ Typical fields:
 - `coverAlt`
 - `featured`
 - `draft`
-- `archived`
 
 #### Projects
 
@@ -392,7 +391,6 @@ Typical fields:
 - `featured`
 - `repoUrl`
 - `liveUrl`
-- `archived`
 
 #### Reviews
 
@@ -410,7 +408,6 @@ Typical fields:
 - `cover`
 - `coverAlt`
 - `featured`
-- `archived`
 
 ---
 
@@ -645,7 +642,7 @@ pnpm format
 
 1. Create a new `.mdx` file in `src/content/writing/`
 2. Add the required frontmatter fields
-3. Add a cover image in an entry-specific folder like `src/assets/content/writing/<entry-slug>/`
+3. Add a cover image from `src/assets/content/writing/`
 4. Write the content
 5. Optionally embed figures or a YouTube video
 
@@ -687,23 +684,6 @@ const posts = await getCollection("writing", ({ data }) => !data.draft);
 ```
 
 If filtering is done after retrieval, the behavior must remain equivalent.
-
-### Archive filtering rule
-
-Archive filtering must be applied intentionally for all collections used on public pages.
-
-Example pattern:
-
-```ts
-const projects = await getCollection("projects", ({ data }) => !data.archived);
-const posts = await getCollection(
-  "writing",
-  ({ data }) => !data.draft && !data.archived,
-);
-const reviews = await getCollection("reviews", ({ data }) => !data.archived);
-```
-
-Archived entries must not appear in archive pages, home-page sections, or generated detail routes.
 
 ### Schema rule
 
@@ -934,7 +914,6 @@ The following content rules are not suggestions. They are the default contract f
 - Content files must live inside `src/content/<collection>/`.
 - Content assets should live inside `src/assets/content/<collection>/`.
 - Draft content must not appear on public listing pages.
-- Archived content must not appear on public listing pages, home sections, or generated detail routes.
 
 ### Writing collection contract
 
@@ -953,7 +932,6 @@ Optional fields:
 - `tags: string[]`
 - `featured: boolean`
 - `draft: boolean`
-- `archived: boolean`
 
 ### Projects collection contract
 
@@ -974,7 +952,6 @@ Optional fields:
 - `featured: boolean`
 - `repoUrl: url`
 - `liveUrl: url`
-- `archived: boolean`
 
 ### Reviews collection contract
 
@@ -995,7 +972,6 @@ Optional fields:
 - `score: number`
 - `tags: string[]`
 - `featured: boolean`
-- `archived: boolean`
 
 ### Collection behavior rules
 
@@ -1003,7 +979,6 @@ Optional fields:
 - Home page sections also prefer `pubDate` descending.
 - `featured: true` is used only for curated highlights.
 - `draft: true` is currently only supported for Writing entries.
-- `archived: true` excludes entries from public listing pages, home sections, and generated detail routes.
 - Scores in Reviews use a **10-point scale**.
 
 ---
@@ -1036,8 +1011,7 @@ URL behavior must stay stable unless there is a strong reason to change it.
 
 - `src/pages/` owns route generation.
 - `src/content/` owns entry content.
-- Collection detail pages must use catch-all `[...slug].astro` routes.
-- Catch-all detail routes support nested content paths while preserving canonical single-segment URLs.
+- Collection detail pages must use dynamic `[slug].astro` routes.
 - `render(entry)` should be used for collection detail page rendering.
 
 ### Public naming rules
@@ -1240,7 +1214,6 @@ Rules:
 ### Asset organization rules
 
 - keep assets grouped by collection
-- keep each entry's media in its own slug-based subfolder
 - use descriptive file names
 - avoid dumping unrelated media into shared folders
 
@@ -1447,16 +1420,15 @@ pubDate: 2026-03-11
 updatedDate: 2026-03-11
 category: "note"
 tags: ["tag-one", "tag-two"]
-cover: ../../assets/content/writing/your-writing-title/cover.jpg
+cover: ../../assets/content/writing/your-cover.jpg
 coverAlt: "Describe the cover image clearly"
 featured: false
 draft: false
-archived: false
 ---
 
 import Figure from "../../components/content/Figure.astro";
 import YouTubeEmbed from "../../components/content/YouTubeEmbed.astro";
-import sampleImage from "../../assets/content/writing/your-writing-title/inline-01.jpg";
+import sampleImage from "../../assets/content/writing/your-inline-image.jpg";
 
 Start with a strong opening paragraph.
 
@@ -1482,17 +1454,16 @@ year: 2026
 status: "in-progress"
 category: "web"
 stack: ["Astro", "React", "Tailwind", "TypeScript"]
-cover: ../../assets/content/projects/project-name/cover.jpg
+cover: ../../assets/content/projects/project-cover.jpg
 coverAlt: "Describe the project cover image clearly"
 featured: false
 repoUrl: "https://github.com/your-name/project-name"
 liveUrl: "https://project.example.com"
-archived: false
 ---
 
 import Figure from "../../components/content/Figure.astro";
 import YouTubeEmbed from "../../components/content/YouTubeEmbed.astro";
-import screenshotOne from "../../assets/content/projects/project-name/screen-01.jpg";
+import screenshotOne from "../../assets/content/projects/project-screen-01.jpg";
 
 ## Overview
 
@@ -1536,15 +1507,14 @@ releaseYear: 2026
 status: "finished"
 score: 8.4
 tags: ["action", "indie"]
-cover: ../../assets/content/reviews/review-title/cover.jpg
+cover: ../../assets/content/reviews/review-cover.jpg
 coverAlt: "Describe the review cover image clearly"
 featured: false
-archived: false
 ---
 
 import Figure from "../../components/content/Figure.astro";
 import YouTubeEmbed from "../../components/content/YouTubeEmbed.astro";
-import stillOne from "../../assets/content/reviews/review-title/still-01.jpg";
+import stillOne from "../../assets/content/reviews/review-still-01.jpg";
 
 ## Quick Verdict
 
