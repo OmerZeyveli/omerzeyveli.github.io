@@ -57,3 +57,14 @@
   - route policy moved to `docs/policies/src-pages.AGENTS.md`
   - policy mapping remains path-based through `docs/AGENT_MAP.md`
   - canonical public route set is protected from governance leaks
+
+## 2026-03-26 - Clarify Astro Header Placement
+
+- id: DEC-0006
+- status: accepted
+- change: clarified mandatory header rule for `.astro` files to use 3 `//` comment lines at the top of the frontmatter block
+- reason: enforce stable top-of-file intent for humans/AI while avoiding formatter/parser conflicts with HTML comments before frontmatter
+- impact:
+  - `AGENTS.md` syntax guidance now separates HTML and Astro behavior
+  - header migration prompt now includes an explicit Astro exception for line placement
+  - future header migrations have deterministic, tool-stable behavior for `.astro` files

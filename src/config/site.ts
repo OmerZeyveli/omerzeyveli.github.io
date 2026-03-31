@@ -1,3 +1,6 @@
+// Purpose: Provide site-wide configuration and navigation data.
+// Scope: Shared settings used by layouts and pages.
+// Audience: Site UI and metadata layers.
 export const siteConfig = {
   name: "Riive",
   title: "Riive",

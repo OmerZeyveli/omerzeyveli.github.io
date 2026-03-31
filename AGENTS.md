@@ -64,10 +64,12 @@ Header requirements:
 - exactly 3 lines
 - describes file purpose/scope/audience
 - uses valid syntax for that file type
+- must be placed at the top of the file (with Astro frontmatter exception below)
 
 Syntax guidance:
 
-- HTML/Astro: `<!-- ... -->`
+- HTML: `<!-- ... -->`
+- Astro: start file with frontmatter and put exactly 3 `// ...` comment lines immediately after the opening `---` delimiter (treated as top-of-file for Astro)
 - TS/JS/CSS: `/* ... */` or `// ...`
 - Python/shell: `# ...`
 - JSON: if pure JSON cannot contain comments, use a sidecar `<file>.comment.md` entry in same folder.

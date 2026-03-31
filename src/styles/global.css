@@ -1,3 +1,6 @@
+/* Purpose: Define global styles, typography, and accessibility utilities. */
+/* Scope: Shared styling for all routes and components. */
+/* Audience: Site UI layers and layout templates. */
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 

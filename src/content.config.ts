@@ -1,3 +1,6 @@
+// Purpose: Define content collections and their schemas.
+// Scope: Central content configuration for Astro collections.
+// Audience: Build pipeline and content tooling.
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";

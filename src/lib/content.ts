@@ -1,3 +1,6 @@
+// Purpose: Provide content collection queries and sorting helpers.
+// Scope: Shared data access for projects, reviews, and writing.
+// Audience: Pages and components fetching content.
 import { getCollection, type CollectionEntry } from "astro:content";
 
 type DatedEntry = CollectionEntry<"projects" | "reviews" | "writing">;
