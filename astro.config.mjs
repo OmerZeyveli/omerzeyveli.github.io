@@ -8,7 +8,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  site: "https://omerzeyveli.com",
+  site: "https://www.omerzeyveli.com",
   integrations: [react(), mdx(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
