@@ -51,12 +51,6 @@ pnpm format
 pnpm check
 ```
 
-## Content rules (summary)
-
-- Keep content entries in `src/content/*` and assets in `src/assets/content/*`.
-- Required fields are enforced by `src/content.config.ts`.
-- Public content must exclude archived entries; writing must also exclude drafts.
-
 ## Deploy
 
 The site is configured for GitHub Pages with a custom domain. Production `site` is set in `astro.config.mjs` and the domain lives in `public/CNAME`.
