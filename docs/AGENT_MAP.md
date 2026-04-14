@@ -34,6 +34,7 @@ Defines which scoped policy files apply to which paths.
 - file: `docs/policies/src-pages.AGENTS.md`
 - applyTo: `src/pages/**`
 - purpose: route behavior and detail/listing contracts
+- note: this policy lives outside `src/pages/**` by design; when editing routes, consult this mapped file explicitly
 
 ### 2.4 Components
 
