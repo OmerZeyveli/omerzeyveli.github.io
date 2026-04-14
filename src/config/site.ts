@@ -13,8 +13,8 @@ export const siteConfig = {
   nav: [
     { href: "/", label: "Home" },
     { href: "/projects", label: "Projects" },
-    { href: "/reviews", label: "Reviews" },
     { href: "/writing", label: "Writing" },
+    { href: "/reviews", label: "Reviews" },
     { href: "/about", label: "About" },
   ],
   social: {
