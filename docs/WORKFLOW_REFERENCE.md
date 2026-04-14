@@ -10,12 +10,10 @@ Status:
 
 ## 0. Legacy Snapshot Archive
 
-If you need the full pre-compression docs exactly as they were in git history, use:
+If you need the full pre-compression docs, consult git history for the earlier
+versions of `README.md` and `AGENTS.md` instead of in-repo snapshot copies.
 
-- `docs/README_LEGACY_FULL.md`
-- `docs/AGENTS_LEGACY_FULL.md`
-
-These are archival references only. Active policy remains in `ARCHITECTURE.md` and `AGENTS.md`.
+Active policy remains in `ARCHITECTURE.md` and `AGENTS.md`.
 
 ## 1. Development Commands
 
