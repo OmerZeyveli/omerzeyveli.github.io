@@ -128,8 +128,8 @@ function isNavItemActive(current: string, href: string): boolean {
 
   if (toggle && mobileNav && iconOpen && iconClose) {
     toggle.addEventListener("click", () => {
-      const isOpen = mobileNav.classList.toggle("hidden");
-      const expanded = !isOpen;
+      const isHidden = mobileNav.classList.toggle("hidden");
+      const expanded = !isHidden;
       toggle.setAttribute("aria-expanded", String(expanded));
       toggle.setAttribute("aria-label", expanded ? "Close menu" : "Open menu");
       iconOpen.classList.toggle("hidden", expanded);
