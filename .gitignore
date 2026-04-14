@@ -1,3 +1,6 @@
+# This ignore file filters generated artifacts and machine-local workspace state.
+# It applies to the root Astro site repository and shared contributor tooling.
+# Maintainers should keep ignores narrow so useful project config can stay tracked.
 # build output
 dist/
 # generated types
@@ -22,5 +25,5 @@ pnpm-debug.log*
 
 # setting folder
 .idea/
-.vscode/
+.vscode/settings.json
 .codex
