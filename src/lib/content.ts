@@ -5,44 +5,10 @@ import { getCollection, type CollectionEntry } from "astro:content";
 
 type DatedEntry = CollectionEntry<"projects" | "reviews" | "writing">;
 
-function sortByPubDateDesc<T extends DatedEntry>(entries: T[]) {
-  return entries.sort(
+function sortByPubDateDesc<T extends DatedEntry>(entries: readonly T[]) {
+  return [...entries].sort(
     (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
   );
-}
-
-// Keep only the latest N items without sorting the entire array.
-function selectLatestByPubDate<T extends DatedEntry>(
-  entries: T[],
-  count: number,
-) {
-  if (count <= 0) {
-    return [];
-  }
-
-  const latest: T[] = [];
-
-  for (const entry of entries) {
-    const entryTime = entry.data.pubDate.getTime();
-    const insertAt = latest.findIndex(
-      (candidate) => entryTime > candidate.data.pubDate.getTime(),
-    );
-
-    if (insertAt === -1) {
-      if (latest.length < count) {
-        latest.push(entry);
-      }
-      continue;
-    }
-
-    latest.splice(insertAt, 0, entry);
-
-    if (latest.length > count) {
-      latest.pop();
-    }
-  }
-
-  return latest;
 }
 
 export async function getWritingPosts() {
@@ -68,7 +34,7 @@ export async function getFeaturedProjects(count?: number) {
   );
 
   if (typeof count === "number") {
-    return selectLatestByPubDate(projects, count);
+    return sortByPubDateDesc(projects).slice(0, count);
   }
 
   return sortByPubDateDesc(projects);
@@ -86,7 +52,7 @@ export async function getFeaturedReviews(count?: number) {
   );
 
   if (typeof count === "number") {
-    return selectLatestByPubDate(reviews, count);
+    return sortByPubDateDesc(reviews).slice(0, count);
   }
 
   return sortByPubDateDesc(reviews);
@@ -99,7 +65,7 @@ export async function getFeaturedWriting(count?: number) {
   );
 
   if (typeof count === "number") {
-    return selectLatestByPubDate(posts, count);
+    return sortByPubDateDesc(posts).slice(0, count);
   }
 
   return sortByPubDateDesc(posts);
@@ -110,10 +76,10 @@ export async function getLatestWriting(count = 3) {
     "writing",
     ({ data }) => !data.draft && !data.archived,
   );
-  return selectLatestByPubDate(posts, count);
+  return sortByPubDateDesc(posts).slice(0, count);
 }
 
 export async function getLatestReviews(count = 3) {
   const reviews = await getCollection("reviews", ({ data }) => !data.archived);
-  return selectLatestByPubDate(reviews, count);
+  return sortByPubDateDesc(reviews).slice(0, count);
 }
