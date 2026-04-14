@@ -9,6 +9,12 @@ Eligibility:
 - Exclude extensions: `.md`, `.mdx`, `.json`
 - Exclude paths: build artifacts and generated files
 
+JSON handling:
+
+- Do not add in-file headers to pure `.json` files.
+- When a touched pure JSON file needs header coverage, create or update a same-folder sidecar named `<file>.comment.md`.
+- Treat JSON sidecars as the required header-equivalent path under the root policy.
+
 Hard constraints:
 
 1. Preserve runtime behavior; do not modify logic/imports/exports.

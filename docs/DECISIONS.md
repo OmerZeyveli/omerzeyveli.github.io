@@ -68,3 +68,14 @@
   - `AGENTS.md` syntax guidance now separates HTML and Astro behavior
   - header migration prompt now includes an explicit Astro exception for line placement
   - future header migrations have deterministic, tool-stable behavior for `.astro` files
+
+## 2026-04-14 - Align JSON Header Migration With Root Policy
+
+- id: DEC-0007
+- status: accepted
+- change: clarified that pure JSON files remain excluded from in-file header insertion but require `<file>.comment.md` sidecars when touched
+- reason: remove ambiguity between the root header rule and the migration prompt for JSON-based config files
+- impact:
+  - `docs/policies/HEADER_MIGRATION_PROMPT.md` now treats JSON as sidecar-driven rather than exempt
+  - touched pure JSON config files should have matching sidecar documentation
+  - header migration guidance now matches the root policy hierarchy
