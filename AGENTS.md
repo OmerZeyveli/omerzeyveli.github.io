@@ -150,3 +150,19 @@ Any rule-level governance change must append a record to `docs/DECISIONS.md`.
 ## 11. Optional Context Source
 
 For templates, examples, and workflow depth, consult `docs/WORKFLOW_REFERENCE.md`.
+
+## 12. Behavior: Self-Update Rules
+
+- Read this file at task start; apply routing and safety rules before editing code.
+- If the same type of wrong-path decision occurs twice during a session, propose a Domain Routing correction to the user before applying it.
+- Self-updates are limited to Domain Routing entries only. Safety rules, asset policies, and Definition of Done are never auto-editable.
+- Every AGENTS.md self-update must be logged in `docs/change-log-for-agents.md`.
+
+Update principles:
+
+- Prefer short bullets over prose.
+- Use real folder, file, and class names — no generic examples.
+- Reflect the actual project, not theory.
+- If a rule becomes ineffective or outdated, revise or remove it.
+- If AI repeatedly makes wrong decisions, the issue may be this file — not only the AI.
+  1
