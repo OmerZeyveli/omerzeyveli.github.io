@@ -29,7 +29,7 @@ The jam theme was <b>"Nothing can go wrong"</b> and we interpreted that as a shi
 
 The game has 10 short survival levels. In each level, the goal is to stay alive for 60 seconds while using movement to line up automatic shots.
 
-Destroyed enemies drop mechanical parts, which become currency for upgrades between levels. This created a loop of survive, collect, then improve health, speed, and cannon stats before the next stage.
+Destroyed enemies drop mechanical parts, which become currency for upgrades between levels. The loop is simple: survive, collect what you can, then improve health, speed, and cannon stats before the next stage.
 
 <Figure
   src={gameplayBattle}
@@ -39,15 +39,15 @@ Destroyed enemies drop mechanical parts, which become currency for upgrades betw
 
 ## Key Systems and Decisions
 
-The biggest design decision was movement. Instead of standard top-down controls, players rotate engines with directional input and hold thrust to move. It made the ship feel different from most jam shooters, but it also introduced a steep learning curve.
+The biggest design decision was movement. Instead of standard top-down controls, players rotate engines with directional input and hold thrust to move. The ship felt different from most jam shooters, but that also made the learning curve steeper than we expected.
 
-Enemy AI was another major challenge under jam time limits. Unity NavMesh did not fit well with 2D projects, so we switched to the free version of A\* Pathfinding Project. Once integrated, it gave us reliable movement and let us focus on enemy behaviors.
+Enemy AI was another major challenge under jam time limits. Unity NavMesh did not fit well with 2D projects, so we switched to the free version of A\* Pathfinding Project. Once it was working, we had reliable enemy movement and could spend more time on behavior design.
 
 The most successful behavior was a blue enemy that orbits the player before taking shots. We built it by attaching an invisible tail target behind the player and making the enemy follow that target for circling movement.
 
 ## Narrative Beats and Progression
 
-Every two levels, the game pauses for a short visual-novel-style story scene. These sections gave players a break from combat and helped pacing across the full run.
+Every two levels, the game pauses for a short visual-novel-style story scene. These sections gave players a break from combat and helped the full run breathe a little.
 
 <Figure
   src={storyNovel}
@@ -73,9 +73,9 @@ Between levels, players spend collected parts in a shop to tune survivability an
 
 ## Outcome and Lessons
 
-We finished the project on time, but the process exposed clear gaps in architecture and documentation. The codebase ended up tightly coupled and difficult to maintain, especially around cross-script references and persistence.
+We finished the project on time, but the process exposed clear gaps in architecture and documentation. The codebase became tightly coupled and hard to maintain, especially around cross-script references and persistence.
 
-The most important lesson was scope discipline. For a one-week jam, unique mechanics are valuable, but they need fast onboarding and clear readability. Zero Control gave us a strong first result and a clear baseline for building cleaner systems in later projects.
+The most important lesson was scope discipline. For a one-week jam, unique mechanics are valuable, but players need to understand them quickly. Zero Control was a strong first result for us, and it gave us a clear baseline for building cleaner systems in later projects.
 
 ## Play the Game
 
