@@ -7,6 +7,7 @@ import ProjectCard from "../components/ui/ProjectCard.astro";
 import WritingCard from "../components/ui/WritingCard.astro";
 import ReviewCard from "../components/ui/ReviewCard.astro";
 import SectionHeading from "../components/ui/SectionHeading.astro";
+import EntryGate from "../components/terminal/EntryGate.astro";
 import { siteConfig } from "../config/site";
 import {
   getFeaturedProjects,
@@ -23,6 +24,8 @@ const latestReviews = await getLatestReviews(3);
   title="Projects, writing, and reviews"
   description="Ömer Zeyveli’s personal site: projects, writing, and reviews on games, media, and tech."
 >
+  <EntryGate />
+
   <section class="space-y-6 border-b border-zinc-800 pb-12">
     <p class="text-sm uppercase tracking-[0.2em] text-zinc-400">
       {siteConfig.name}

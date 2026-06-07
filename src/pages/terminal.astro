@@ -1,0 +1,380 @@
+---
+// Purpose: Render the in-browser shell that browses content collections as files.
+// Scope: Client-only route reached from the "programmer" entry gate or footer link.
+// Audience: Visitors who prefer a CLI over a graphical landing page.
+import TerminalLayout from "../layouts/TerminalLayout.astro";
+import { getProjects, getWritingPosts, getReviews } from "../lib/content";
+import { siteConfig } from "../config/site";
+
+type Entry = { slug: string; title: string };
+
+const toEntries = (
+  items: Array<{ id: string; data: { title: string } }>,
+): Entry[] => items.map((item) => ({ slug: item.id, title: item.data.title }));
+
+const fs = {
+  projects: toEntries(await getProjects()),
+  writing: toEntries(await getWritingPosts()),
+  reviews: toEntries(await getReviews()),
+};
+
+const author = siteConfig.name;
+---
+
+<TerminalLayout>
+  <main
+    id="term"
+    class="fixed inset-0 flex flex-col bg-black font-mono text-emerald-300"
+  >
+    <div
+      id="term-output"
+      class="flex-1 overflow-y-auto px-4 pt-4 text-sm leading-6 whitespace-pre-wrap break-words sm:px-6"
+      aria-live="polite"
+    >
+    </div>
+    <form
+      id="term-form"
+      class="flex items-center gap-2 px-4 pb-4 text-sm sm:px-6"
+      autocomplete="off"
+    >
+      <span id="term-prefix" class="shrink-0 text-emerald-400 select-none"
+        >visitor@riive:/$</span
+      >
+      <input
+        id="term-input"
+        type="text"
+        class="flex-1 bg-transparent text-emerald-100 caret-emerald-300 outline-none"
+        autocomplete="off"
+        autocapitalize="off"
+        autocorrect="off"
+        spellcheck="false"
+        aria-label="Terminal input"
+      />
+    </form>
+  </main>
+
+  <script is:inline define:vars={{ fs, author }}>
+    const STORAGE_KEY = "riive:entry-mode";
+    const collections = ["projects", "writing", "reviews"];
+
+    const output = document.getElementById("term-output");
+    const form = document.getElementById("term-form");
+    const input = document.getElementById("term-input");
+    const prefix = document.getElementById("term-prefix");
+    if (!output || !form || !input || !prefix) {
+      throw new Error("terminal: missing DOM");
+    }
+
+    let cwd = "/";
+    const history = [];
+    let historyIndex = -1;
+    let draft = "";
+
+    const renderPrefix = () => {
+      prefix.textContent = `visitor@riive:${cwd}$`;
+    };
+
+    const print = (text = "", className = "") => {
+      const line = document.createElement("div");
+      if (className) line.className = className;
+      line.textContent = text;
+      output.appendChild(line);
+    };
+
+    const printHTML = (html, className = "") => {
+      const line = document.createElement("div");
+      if (className) line.className = className;
+      line.innerHTML = html;
+      output.appendChild(line);
+    };
+
+    const scrollToBottom = () => {
+      output.scrollTop = output.scrollHeight;
+    };
+
+    const escapeHTML = (value) =>
+      String(value).replace(
+        /[&<>"']/g,
+        (ch) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[ch] ?? ch,
+      );
+
+    const banner = () => {
+      print(`${author} // terminal`, "text-emerald-400");
+      print(
+        "Type `help` to see commands. Type `exit` to leave.",
+        "text-zinc-500",
+      );
+      print("");
+    };
+
+    const resolvePath = (raw) => {
+      if (!raw || raw === "~") return "/";
+      let parts;
+      if (raw.startsWith("/")) {
+        parts = raw.split("/").filter(Boolean);
+      } else {
+        const base = cwd === "/" ? [] : cwd.split("/").filter(Boolean);
+        parts = base.concat(raw.split("/").filter(Boolean));
+      }
+      const stack = [];
+      for (const part of parts) {
+        if (part === "." || part === "") continue;
+        if (part === "..") {
+          stack.pop();
+          continue;
+        }
+        stack.push(part);
+      }
+      return "/" + stack.join("/");
+    };
+
+    const listAt = (path) => {
+      if (path === "/") {
+        return collections.map((name) => ({ name, kind: "dir" }));
+      }
+      const segments = path.split("/").filter(Boolean);
+      if (segments.length === 1 && collections.includes(segments[0])) {
+        return fs[segments[0]].map((entry) => ({
+          name: entry.slug,
+          kind: "file",
+          title: entry.title,
+        }));
+      }
+      return null;
+    };
+
+    const findEntry = (collection, slug) =>
+      fs[collection]?.find((entry) => entry.slug === slug) ?? null;
+
+    const commands = {
+      help() {
+        print("available commands:", "text-emerald-400");
+        const rows = [
+          ["help", "show this message"],
+          ["ls [path]", "list entries in a directory"],
+          ["cd <dir>", "change directory (use .. or / or ~)"],
+          ["pwd", "print working directory"],
+          ["open <slug>", "open an entry in a new tab"],
+          ["whoami", "you tell me"],
+          ["clear", "clear the screen"],
+          ["exit", "leave the terminal"],
+        ];
+        for (const [name, desc] of rows) {
+          printHTML(
+            `  <span class="text-emerald-300">${escapeHTML(name).padEnd(18)}</span><span class="text-zinc-400">${escapeHTML(desc)}</span>`,
+          );
+        }
+      },
+
+      pwd() {
+        print(cwd);
+      },
+
+      whoami() {
+        print("visitor");
+      },
+
+      clear() {
+        output.replaceChildren();
+      },
+
+      exit() {
+        try {
+          window.localStorage.setItem(STORAGE_KEY, "human");
+        } catch {
+          /* storage unavailable */
+        }
+        window.location.assign("/");
+      },
+
+      ls(args) {
+        const target = resolvePath(args[0] ?? cwd);
+        const listing = listAt(target);
+        if (!listing) {
+          print(`ls: cannot access '${args[0] ?? target}': no such directory`);
+          return;
+        }
+        if (listing.length === 0) {
+          print("(empty)", "text-zinc-500");
+          return;
+        }
+        for (const item of listing) {
+          if (item.kind === "dir") {
+            printHTML(
+              `<span class="text-emerald-300">${escapeHTML(item.name)}/</span>`,
+            );
+          } else {
+            printHTML(
+              `<span class="text-emerald-100">${escapeHTML(item.name)}</span>  <span class="text-zinc-500">${escapeHTML(item.title)}</span>`,
+            );
+          }
+        }
+      },
+
+      cd(args) {
+        const target = resolvePath(args[0] ?? "/");
+        if (target === "/") {
+          cwd = "/";
+          return;
+        }
+        const segments = target.split("/").filter(Boolean);
+        if (segments.length === 1 && collections.includes(segments[0])) {
+          cwd = target;
+          return;
+        }
+        print(`cd: no such directory: ${args[0] ?? target}`);
+      },
+
+      open(args) {
+        if (!args[0]) {
+          print("open: missing argument. usage: open <slug>");
+          return;
+        }
+        const resolved = resolvePath(args[0]);
+        const segments = resolved.split("/").filter(Boolean);
+        let collection;
+        let slug;
+        if (segments.length === 2 && collections.includes(segments[0])) {
+          [collection, slug] = segments;
+        } else if (segments.length === 1) {
+          const here = cwd.split("/").filter(Boolean);
+          if (here.length === 1 && collections.includes(here[0])) {
+            collection = here[0];
+            slug = segments[0];
+          } else {
+            print(
+              "open: ambiguous. cd into projects/, writing/, or reviews/ first, or use open <collection>/<slug>.",
+            );
+            return;
+          }
+        } else {
+          print(`open: not an entry: ${args[0]}`);
+          return;
+        }
+        const entry = findEntry(collection, slug);
+        if (!entry) {
+          print(`open: not found: ${slug}`);
+          return;
+        }
+        const url = `/${collection}/${slug}/`;
+        printHTML(
+          `opening <span class="text-emerald-300">${escapeHTML(url)}</span> in a new tab...`,
+        );
+        window.open(url, "_blank", "noopener,noreferrer");
+      },
+    };
+
+    commands.gui = commands.exit;
+
+    const completionsAt = (path) => {
+      const listing = listAt(path);
+      if (!listing) return [];
+      return listing.map((item) =>
+        item.kind === "dir" ? `${item.name}/` : item.name,
+      );
+    };
+
+    const handleTab = () => {
+      const value = input.value;
+      const parts = value.split(/\s+/);
+      if (parts.length < 2) return;
+      const fragment = parts[parts.length - 1];
+      const lastSlash = fragment.lastIndexOf("/");
+      const dir =
+        lastSlash === -1
+          ? cwd
+          : resolvePath(fragment.slice(0, lastSlash + 1) || "/");
+      const prefixFragment =
+        lastSlash === -1 ? fragment : fragment.slice(lastSlash + 1);
+      const dirPart = lastSlash === -1 ? "" : fragment.slice(0, lastSlash + 1);
+      const candidates = completionsAt(dir).filter((name) =>
+        name.toLowerCase().startsWith(prefixFragment.toLowerCase()),
+      );
+      if (candidates.length === 0) return;
+      if (candidates.length === 1) {
+        parts[parts.length - 1] = dirPart + candidates[0];
+        input.value = parts.join(" ");
+        return;
+      }
+      print(candidates.join("  "), "text-zinc-500");
+      scrollToBottom();
+    };
+
+    const run = (raw) => {
+      const trimmed = raw.trim();
+      printHTML(
+        `<span class="text-emerald-400">visitor@riive:${escapeHTML(cwd)}$</span> ${escapeHTML(raw)}`,
+      );
+      if (!trimmed) return;
+      const [name, ...args] = trimmed.split(/\s+/);
+      const cmd = commands[name];
+      if (!cmd) {
+        print(`${name}: command not found. type 'help'.`);
+        return;
+      }
+      cmd(args);
+    };
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const value = input.value;
+      input.value = "";
+      run(value);
+      if (value.trim()) {
+        history.push(value);
+        historyIndex = history.length;
+      }
+      renderPrefix();
+      scrollToBottom();
+    });
+
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Tab") {
+        event.preventDefault();
+        handleTab();
+        return;
+      }
+      if (event.key === "ArrowUp") {
+        if (history.length === 0) return;
+        event.preventDefault();
+        if (historyIndex === history.length) draft = input.value;
+        historyIndex = Math.max(0, historyIndex - 1);
+        input.value = history[historyIndex];
+        return;
+      }
+      if (event.key === "ArrowDown") {
+        if (history.length === 0) return;
+        event.preventDefault();
+        historyIndex = Math.min(history.length, historyIndex + 1);
+        input.value =
+          historyIndex === history.length ? draft : history[historyIndex];
+        return;
+      }
+      if (event.key === "l" && event.ctrlKey) {
+        event.preventDefault();
+        commands.clear();
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (
+        target instanceof HTMLAnchorElement ||
+        window.getSelection()?.toString()
+      )
+        return;
+      input.focus();
+    });
+
+    renderPrefix();
+    banner();
+    input.focus();
+  </script>
+</TerminalLayout>

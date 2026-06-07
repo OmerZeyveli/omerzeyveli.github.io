@@ -1,0 +1,36 @@
+---
+// Purpose: Render a chromeless full-viewport shell for the terminal route.
+// Scope: Layout used only by src/pages/terminal.astro.
+// Audience: Visitors who entered the site via the "programmer" gate.
+import "../styles/global.css";
+import { siteConfig } from "../config/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = `${siteConfig.name} — terminal`,
+  description = "An in-browser shell for browsing projects, writing, and reviews.",
+} = Astro.props;
+
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={canonicalUrl} />
+    <title>{title}</title>
+  </head>
+  <body class="bg-black text-zinc-100 antialiased">
+    <slot />
+  </body>
+</html>
