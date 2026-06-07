@@ -1,0 +1,6 @@
+# Purpose: Configure pnpm v11+ install behavior for the static Astro site.
+# Scope: Repo-root pnpm settings file; replaces the deprecated package.json#pnpm field.
+# Audience: pnpm CLI (local dev and GitHub Pages CI).
+allowBuilds:
+  esbuild: true
+  sharp: true
