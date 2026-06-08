@@ -56,33 +56,24 @@ const author = siteConfig.name;
   </main>
 
   <style is:global>
-    /* The block cursor follows the typed text with no whitespace gap. */
+    /* Block cursor: a ::after on the shadow span so it trails the typed text
+       with no whitespace gap. Blink is driven from JS (see script) so it works
+       even under the global reduced-motion rule that disables CSS animations. */
     #term-shadow::after {
       content: "";
       display: inline-block;
       width: 1ch;
-      height: 1.1em;
+      height: 1.2em;
       margin-left: 1px;
-      vertical-align: text-bottom;
-      transform: translateY(0.12em);
-      background-color: rgb(110 231 183 / 0.9);
-      animation: term-blink 1.06s step-end infinite;
+      vertical-align: middle;
+      background-color: #6ee7b7;
+      opacity: var(--term-cursor-opacity, 1);
     }
     /* Override the global focus-visible ring; the cursor is the focus cue. */
     #term-input:focus,
     #term-input:focus-visible {
       outline: none;
       border-radius: 0;
-    }
-    @keyframes term-blink {
-      50% {
-        opacity: 0;
-      }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      #term-shadow::after {
-        animation: none;
-      }
     }
   </style>
 
@@ -440,6 +431,17 @@ const author = siteConfig.name;
         return;
       input.focus();
     });
+
+    // Blink the cursor from JS: a CSS animation would be suppressed by the
+    // global reduced-motion rule, but the cursor blink is a wanted affordance.
+    let cursorVisible = true;
+    setInterval(() => {
+      cursorVisible = !cursorVisible;
+      shadow.style.setProperty(
+        "--term-cursor-opacity",
+        cursorVisible ? "1" : "0",
+      );
+    }, 530);
 
     renderPrefix();
     banner();
