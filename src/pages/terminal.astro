@@ -24,44 +24,79 @@ const author = siteConfig.name;
 <TerminalLayout>
   <main
     id="term"
-    class="fixed inset-0 flex flex-col bg-black font-mono text-emerald-300"
+    class="fixed inset-0 overflow-y-auto bg-black font-mono text-sm leading-6 text-emerald-300"
   >
-    <div
-      id="term-output"
-      class="flex-1 overflow-y-auto px-4 pt-4 text-sm leading-6 whitespace-pre-wrap break-words sm:px-6"
-      aria-live="polite"
-    >
-    </div>
-    <form
-      id="term-form"
-      class="flex items-center gap-2 px-4 pb-4 text-sm sm:px-6"
-      autocomplete="off"
-    >
-      <span id="term-prefix" class="shrink-0 text-emerald-400 select-none"
-        >visitor@riive:/$</span
+    <div class="px-4 py-4 sm:px-6">
+      <div
+        id="term-output"
+        class="whitespace-pre-wrap break-words"
+        aria-live="polite"
+        role="log"
       >
-      <input
-        id="term-input"
-        type="text"
-        class="flex-1 bg-transparent text-emerald-100 caret-emerald-300 outline-none"
-        autocomplete="off"
-        autocapitalize="off"
-        autocorrect="off"
-        spellcheck="false"
-        aria-label="Terminal input"
-      />
-    </form>
+      </div>
+      <form id="term-form" class="flex items-baseline gap-2" autocomplete="off">
+        <span id="term-prefix" class="shrink-0 text-emerald-400 select-none"
+          >visitor@riive:/$</span
+        >
+        <span id="term-line" class="relative inline-block min-w-[1ch]">
+          <span id="term-shadow" class="whitespace-pre text-emerald-100"></span>
+          <input
+            id="term-input"
+            type="text"
+            class="absolute inset-0 h-full w-full appearance-none border-0 bg-transparent p-0 text-transparent caret-transparent outline-none"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            aria-label="Terminal input"
+          />
+        </span>
+      </form>
+    </div>
   </main>
+
+  <style is:global>
+    /* The block cursor follows the typed text with no whitespace gap. */
+    #term-shadow::after {
+      content: "";
+      display: inline-block;
+      width: 1ch;
+      height: 1.1em;
+      margin-left: 1px;
+      vertical-align: text-bottom;
+      transform: translateY(0.12em);
+      background-color: rgb(110 231 183 / 0.9);
+      animation: term-blink 1.06s step-end infinite;
+    }
+    /* Override the global focus-visible ring; the cursor is the focus cue. */
+    #term-input:focus,
+    #term-input:focus-visible {
+      outline: none;
+      border-radius: 0;
+    }
+    @keyframes term-blink {
+      50% {
+        opacity: 0;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #term-shadow::after {
+        animation: none;
+      }
+    }
+  </style>
 
   <script is:inline define:vars={{ fs, author }}>
     const STORAGE_KEY = "riive:entry-mode";
     const collections = ["projects", "writing", "reviews"];
 
+    const term = document.getElementById("term");
     const output = document.getElementById("term-output");
     const form = document.getElementById("term-form");
     const input = document.getElementById("term-input");
     const prefix = document.getElementById("term-prefix");
-    if (!output || !form || !input || !prefix) {
+    const shadow = document.getElementById("term-shadow");
+    if (!term || !output || !form || !input || !prefix || !shadow) {
       throw new Error("terminal: missing DOM");
     }
 
@@ -89,7 +124,13 @@ const author = siteConfig.name;
     };
 
     const scrollToBottom = () => {
-      output.scrollTop = output.scrollHeight;
+      term.scrollTop = term.scrollHeight;
+    };
+
+    // Mirror the (transparent) input into the visible shadow span so the
+    // block cursor — a ::after on the shadow — always trails the typed text.
+    const renderInput = () => {
+      shadow.textContent = input.value;
     };
 
     const escapeHTML = (value) =>
@@ -168,7 +209,7 @@ const author = siteConfig.name;
         ];
         for (const [name, desc] of rows) {
           printHTML(
-            `  <span class="text-emerald-300">${escapeHTML(name).padEnd(18)}</span><span class="text-zinc-400">${escapeHTML(desc)}</span>`,
+            `  <span class="text-emerald-300">${escapeHTML(name.padEnd(18))}</span><span class="text-zinc-400">${escapeHTML(desc)}</span>`,
           );
         }
       },
@@ -281,6 +322,18 @@ const author = siteConfig.name;
       );
     };
 
+    const commonPrefix = (values) => {
+      if (values.length === 0) return "";
+      let prefix = values[0];
+      for (const value of values.slice(1)) {
+        while (prefix && !value.startsWith(prefix)) {
+          prefix = prefix.slice(0, -1);
+        }
+        if (!prefix) return "";
+      }
+      return prefix;
+    };
+
     const handleTab = () => {
       const value = input.value;
       const parts = value.split(/\s+/);
@@ -301,6 +354,16 @@ const author = siteConfig.name;
       if (candidates.length === 1) {
         parts[parts.length - 1] = dirPart + candidates[0];
         input.value = parts.join(" ");
+        renderInput();
+        return;
+      }
+      // Multiple matches: extend to the longest common prefix (bash behavior),
+      // and only list when there is nothing further to fill in.
+      const shared = commonPrefix(candidates);
+      if (shared.length > prefixFragment.length) {
+        parts[parts.length - 1] = dirPart + shared;
+        input.value = parts.join(" ");
+        renderInput();
         return;
       }
       print(candidates.join("  "), "text-zinc-500");
@@ -326,6 +389,7 @@ const author = siteConfig.name;
       event.preventDefault();
       const value = input.value;
       input.value = "";
+      renderInput();
       run(value);
       if (value.trim()) {
         history.push(value);
@@ -334,6 +398,8 @@ const author = siteConfig.name;
       renderPrefix();
       scrollToBottom();
     });
+
+    input.addEventListener("input", renderInput);
 
     input.addEventListener("keydown", (event) => {
       if (event.key === "Tab") {
@@ -347,6 +413,7 @@ const author = siteConfig.name;
         if (historyIndex === history.length) draft = input.value;
         historyIndex = Math.max(0, historyIndex - 1);
         input.value = history[historyIndex];
+        renderInput();
         return;
       }
       if (event.key === "ArrowDown") {
@@ -355,6 +422,7 @@ const author = siteConfig.name;
         historyIndex = Math.min(history.length, historyIndex + 1);
         input.value =
           historyIndex === history.length ? draft : history[historyIndex];
+        renderInput();
         return;
       }
       if (event.key === "l" && event.ctrlKey) {
@@ -375,6 +443,7 @@ const author = siteConfig.name;
 
     renderPrefix();
     banner();
+    renderInput();
     input.focus();
   </script>
 </TerminalLayout>
