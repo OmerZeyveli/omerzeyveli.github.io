@@ -56,16 +56,20 @@ const author = siteConfig.name;
   </main>
 
   <style is:global>
-    /* Block cursor: a ::after on the shadow span so it trails the typed text
-       with no whitespace gap. Blink is driven from JS (see script) so it works
-       even under the global reduced-motion rule that disables CSS animations. */
+    /* Block cursor: a ::after on the shadow span. It trails the text with no
+       whitespace gap and — crucially — keeps a stable baseline even when the
+       input is empty. Anchored to the text baseline (with a small dip below it
+       for the descender area) so it sits on the text like a character cell,
+       independent of line-height. Blink is driven from JS (see script) so it
+       survives the global reduced-motion rule that disables CSS animations. */
     #term-shadow::after {
       content: "";
       display: inline-block;
-      width: 1ch;
-      height: 1.2em;
+      width: 0.9ch;
+      height: 1em;
       margin-left: 1px;
-      vertical-align: middle;
+      margin-bottom: -0.15em;
+      vertical-align: baseline;
       background-color: #6ee7b7;
       opacity: var(--term-cursor-opacity, 1);
     }
