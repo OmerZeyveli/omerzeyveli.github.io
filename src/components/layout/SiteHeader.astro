@@ -121,12 +121,16 @@ function isNavItemActive(current: string, href: string): boolean {
 </header>
 
 <script>
-  const toggle = document.getElementById("mobile-menu-toggle");
-  const mobileNav = document.getElementById("mobile-nav");
-  const iconOpen = document.getElementById("menu-icon-open");
-  const iconClose = document.getElementById("menu-icon-close");
+  function initMenu() {
+    const toggle = document.getElementById("mobile-menu-toggle");
+    const mobileNav = document.getElementById("mobile-nav");
+    const iconOpen = document.getElementById("menu-icon-open");
+    const iconClose = document.getElementById("menu-icon-close");
 
-  if (toggle && mobileNav && iconOpen && iconClose) {
+    if (!toggle || !mobileNav || !iconOpen || !iconClose) return;
+    if (toggle.dataset.bound) return;
+    toggle.dataset.bound = "true";
+
     toggle.addEventListener("click", () => {
       const isHidden = mobileNav.classList.toggle("hidden");
       const expanded = !isHidden;
@@ -136,4 +140,8 @@ function isNavItemActive(current: string, href: string): boolean {
       iconClose.classList.toggle("hidden", !expanded);
     });
   }
+
+  initMenu();
+  // Rebind after client-router page swaps replace the header DOM.
+  document.addEventListener("astro:page-load", initMenu);
 </script>

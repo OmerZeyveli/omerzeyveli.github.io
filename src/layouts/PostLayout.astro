@@ -13,10 +13,18 @@ interface Props {
   updatedDate?: Date;
   cover?: ImageMetadata;
   coverAlt?: string;
+  coverTransitionName?: string;
 }
 
-const { title, description, pubDate, updatedDate, cover, coverAlt } =
-  Astro.props;
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  cover,
+  coverAlt,
+  coverTransitionName,
+} = Astro.props;
 
 const siteUrl = Astro.site ?? new URL(Astro.url.origin);
 const ogImage = cover ? new URL(cover.src, siteUrl).href : undefined;
@@ -68,6 +76,10 @@ const ogImage = cover ? new URL(cover.src, siteUrl).href : undefined;
             src={cover}
             alt={coverAlt}
             class="aspect-16/10 w-full rounded-2xl border border-zinc-800 object-cover sm:rounded-4xl"
+            style={
+              coverTransitionName &&
+              `view-transition-name: ${coverTransitionName};`
+            }
             widths={[900, 1400, 1800]}
             sizes="(max-width: 768px) 100vw, 768px"
           />

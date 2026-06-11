@@ -5,6 +5,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectCard from "../../components/ui/ProjectCard.astro";
 import { getProjects } from "../../lib/content";
+import { coverTransitionName } from "../../lib/transitions";
 
 const projects = await getProjects();
 ---
@@ -36,6 +37,7 @@ const projects = await getProjects();
             category={project.data.category}
             year={project.data.year}
             stack={project.data.stack}
+            transitionName={coverTransitionName("projects", project.id)}
           />
         ))
       }

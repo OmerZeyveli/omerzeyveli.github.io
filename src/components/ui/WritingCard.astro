@@ -15,6 +15,7 @@ interface Props {
   pubDate: Date;
   headingLevel?: "h2" | "h3";
   sizes?: string;
+  transitionName?: string;
 }
 
 const {
@@ -27,6 +28,7 @@ const {
   pubDate,
   headingLevel = "h2",
   sizes = "(max-width: 768px) 100vw, 50vw",
+  transitionName,
 } = Astro.props;
 
 const Heading = headingLevel;
@@ -40,6 +42,7 @@ const Heading = headingLevel;
     src={cover}
     alt={coverAlt}
     class="aspect-16/10 w-full object-cover"
+    style={transitionName && `view-transition-name: ${transitionName};`}
     widths={[600, 900, 1200]}
     sizes={sizes}
   />

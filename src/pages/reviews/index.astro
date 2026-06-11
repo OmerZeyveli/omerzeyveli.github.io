@@ -5,6 +5,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ReviewCard from "../../components/ui/ReviewCard.astro";
 import { getReviews } from "../../lib/content";
+import { coverTransitionName } from "../../lib/transitions";
 
 const reviews = await getReviews();
 ---
@@ -33,6 +34,7 @@ const reviews = await getReviews();
             description={review.data.description}
             type={review.data.type}
             score={review.data.score}
+            transitionName={coverTransitionName("reviews", review.id)}
           />
         ))
       }

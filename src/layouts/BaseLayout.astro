@@ -3,6 +3,7 @@
 // Scope: Shared layout wrapper for all pages.
 // Audience: All site routes.
 import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
 import SiteHeader from "../components/layout/SiteHeader.astro";
 import SiteFooter from "../components/layout/SiteFooter.astro";
 import { siteConfig } from "../config/site";
@@ -59,6 +60,8 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
     <meta name="twitter:description" content={description} />
     {image && <meta name="twitter:image" content={image} />}
     {imageAlt && <meta name="twitter:image:alt" content={imageAlt} />}
+
+    <ClientRouter />
   </head>
   <body class="bg-zinc-950 text-zinc-100 antialiased">
     <a href="#main-content" class="skip-link">Skip to main content</a>

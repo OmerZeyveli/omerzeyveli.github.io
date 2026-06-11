@@ -6,6 +6,7 @@ import { getCollection, render } from "astro:content";
 import PostLayout from "../../layouts/PostLayout.astro";
 import Figure from "../../components/content/Figure.astro";
 import YouTubeEmbed from "../../components/content/YouTubeEmbed.astro";
+import { coverTransitionName } from "../../lib/transitions";
 
 export async function getStaticPaths() {
   const reviews = await getCollection("reviews", ({ data }) => !data.archived);
@@ -27,6 +28,7 @@ const { type, score } = review.data;
   pubDate={review.data.pubDate}
   cover={review.data.cover}
   coverAlt={review.data.coverAlt}
+  coverTransitionName={coverTransitionName("reviews", review.id)}
 >
   <div slot="meta" class="flex flex-wrap items-center gap-3 text-sm">
     <span class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300">

@@ -5,6 +5,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import WritingCard from "../../components/ui/WritingCard.astro";
 import { getWritingPosts } from "../../lib/content";
+import { coverTransitionName } from "../../lib/transitions";
 
 const posts = await getWritingPosts();
 ---
@@ -33,6 +34,7 @@ const posts = await getWritingPosts();
             description={post.data.description}
             category={post.data.category}
             pubDate={post.data.pubDate}
+            transitionName={coverTransitionName("writing", post.id)}
           />
         ))
       }
