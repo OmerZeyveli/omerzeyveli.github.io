@@ -165,3 +165,46 @@ a {
   overflow: hidden;
   min-height: 3rem;
 }
+
+/* 3D tilt + glare hover for content cards (variables set by card-tilt.ts).
+   Gated so touch devices and reduced-motion users keep the plain hover tint. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .card-tilt {
+    transform: perspective(900px) rotateX(var(--rx, 0deg))
+      rotateY(var(--ry, 0deg)) scale(var(--card-scale, 1));
+    /* Re-lists background/border because this shorthand overrides the
+       Tailwind transition utility on the same element. */
+    transition:
+      transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 150ms ease,
+      border-color 200ms ease;
+  }
+
+  .card-tilt.is-tilting {
+    /* Fast linear tracking while hovered; the 600ms ease above only plays
+       on pointerleave for a soft settle back to rest. */
+    transition-duration: 90ms, 150ms, 200ms;
+    transition-timing-function: linear, ease, ease;
+    --card-scale: 1.015;
+    will-change: transform;
+  }
+
+  .card-tilt::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: radial-gradient(
+      420px circle at var(--mx, 50%) var(--my, 50%),
+      rgb(255 255 255 / 0.06),
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 250ms ease;
+  }
+
+  .card-tilt.is-tilting::after {
+    opacity: 1;
+  }
+}
