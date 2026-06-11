@@ -33,12 +33,12 @@ const Heading = headingLevel;
 
 <a
   href={href}
-  class="flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-800 transition hover:bg-zinc-900/60 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 sm:rounded-[1.75rem]"
+  class="card-tilt group relative flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-800 transition hover:border-zinc-700 hover:bg-zinc-900/60 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 sm:rounded-[1.75rem]"
 >
   <Image
     src={cover}
     alt={coverAlt}
-    class="aspect-16/10 w-full object-cover"
+    class="aspect-16/10 w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
     widths={[600, 900, 1200]}
     sizes={sizes}
   />
@@ -57,3 +57,7 @@ const Heading = headingLevel;
     </p>
   </div>
 </a>
+
+<script>
+  import "../../scripts/card-tilt";
+</script>
