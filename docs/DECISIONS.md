@@ -79,3 +79,14 @@
   - `docs/policies/HEADER_MIGRATION_PROMPT.md` now treats JSON as sidecar-driven rather than exempt
   - touched pure JSON config files should have matching sidecar documentation
   - header migration guidance now matches the root policy hierarchy
+
+## 2026-06-12 - Add Claude Code Bridge And Consolidate Self-Update Logging
+
+- id: DEC-0008
+- status: accepted
+- change: added root `CLAUDE.md` importing `AGENTS.md`; AGENTS.md self-update logging consolidated into `docs/DECISIONS.md`
+- reason: Claude Code loads `CLAUDE.md` rather than `AGENTS.md`, so repository policy was invisible to Claude sessions; the previous self-update log target (`docs/change-log-for-agents.md`) never existed
+- impact:
+  - Claude Code sessions now load root policy automatically through the bridge import
+  - section 12 of `AGENTS.md` logs self-updates to `docs/DECISIONS.md`
+  - dangling log-file reference removed

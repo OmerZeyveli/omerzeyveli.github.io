@@ -19,6 +19,16 @@ Inherits root constraints from `AGENTS.md`.
 - Keep shared data/query helpers in `src/lib/`.
 - Keep site-level config in `src/config/`.
 - Keep styling defaults in `src/styles/`.
+- Keep client-side behavior scripts in `src/scripts/`.
+
+## 2.1 Client Router Rules
+
+- Module scripts execute once per session under the client router; any
+  DOM-binding script must rebind on `astro:page-load` with a per-element
+  guard (pattern: `src/scripts/card-tilt.ts`).
+- Do not add static `view-transition-name` to repeated elements; cover
+  morph naming goes through `src/scripts/cover-morph.ts` with names from
+  `src/lib/transitions.ts`.
 
 ## 3. Naming And Structure
 
