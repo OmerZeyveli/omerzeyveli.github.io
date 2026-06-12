@@ -1,6 +1,7 @@
 {
   "semi": true,
   "singleQuote": false,
+  "endOfLine": "auto",
   "plugins": ["prettier-plugin-astro"],
   "overrides": [
     {

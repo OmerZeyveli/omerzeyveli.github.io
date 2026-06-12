@@ -80,6 +80,7 @@ const ogImage = cover ? new URL(cover.src, siteUrl).href : undefined;
               coverTransitionName &&
               `view-transition-name: ${coverTransitionName};`
             }
+            data-post-cover={coverTransitionName}
             widths={[900, 1400, 1800]}
             sizes="(max-width: 768px) 100vw, 768px"
           />
