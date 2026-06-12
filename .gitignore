@@ -27,5 +27,5 @@ pnpm-debug.log*
 .idea/
 .vscode/settings.json
 .codex
-# machine-local Claude Code settings (shared .claude config stays tracked)
-.claude/settings.local.json
+# Claude Code workspace state (machine-local tooling, not project source)
+.claude/
