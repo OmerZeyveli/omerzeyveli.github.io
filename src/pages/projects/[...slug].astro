@@ -6,6 +6,7 @@ import { getCollection, render } from "astro:content";
 import PostLayout from "../../layouts/PostLayout.astro";
 import Figure from "../../components/content/Figure.astro";
 import YouTubeEmbed from "../../components/content/YouTubeEmbed.astro";
+import { coverTransitionName } from "../../lib/transitions";
 
 export async function getStaticPaths() {
   const projects = await getCollection(
@@ -30,6 +31,7 @@ const { year, status, category, stack, repoUrl, liveUrl } = project.data;
   pubDate={project.data.pubDate}
   cover={project.data.cover}
   coverAlt={project.data.coverAlt}
+  coverTransitionName={coverTransitionName("projects", project.id)}
 >
   <div slot="meta" class="flex flex-wrap items-center gap-2 text-sm sm:gap-3">
     <span class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300">

@@ -14,6 +14,7 @@ interface Props {
   score?: number;
   headingLevel?: "h2" | "h3";
   sizes?: string;
+  transitionName?: string;
 }
 
 const {
@@ -26,6 +27,7 @@ const {
   score,
   headingLevel = "h2",
   sizes = "(max-width: 768px) 100vw, 50vw",
+  transitionName,
 } = Astro.props;
 
 const Heading = headingLevel;
@@ -38,7 +40,8 @@ const Heading = headingLevel;
   <Image
     src={cover}
     alt={coverAlt}
-    class="aspect-16/10 w-full object-cover"
+    class="aspect-16/10 w-full rounded-t-2xl object-cover sm:rounded-t-[1.75rem]"
+    data-card-cover={transitionName}
     widths={[600, 900, 1200]}
     sizes={sizes}
   />

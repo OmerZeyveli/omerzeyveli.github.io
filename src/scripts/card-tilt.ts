@@ -14,9 +14,24 @@ function initCard(card: HTMLElement) {
   let lastX = 0;
   let lastY = 0;
 
+  const reset = () => {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = 0;
+    rect = null;
+    card.classList.remove("is-tilting");
+    card.style.setProperty("--rx", "0deg");
+    card.style.setProperty("--ry", "0deg");
+  };
+
   const update = () => {
     rafId = 0;
     if (!rect) return;
+    if (REDUCED_MOTION.matches) {
+      // Checked per frame instead of via a media-query listener, which
+      // would outlive cards swapped out by the client router.
+      reset();
+      return;
+    }
     const px = Math.min(Math.max((lastX - rect.left) / rect.width, 0), 1);
     const py = Math.min(Math.max((lastY - rect.top) / rect.height, 0), 1);
     card.style.setProperty(
@@ -29,15 +44,6 @@ function initCard(card: HTMLElement) {
     );
     card.style.setProperty("--mx", `${(px * 100).toFixed(2)}%`);
     card.style.setProperty("--my", `${(py * 100).toFixed(2)}%`);
-  };
-
-  const reset = () => {
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = 0;
-    rect = null;
-    card.classList.remove("is-tilting");
-    card.style.setProperty("--rx", "0deg");
-    card.style.setProperty("--ry", "0deg");
   };
 
   card.addEventListener("pointerenter", () => {
@@ -54,10 +60,18 @@ function initCard(card: HTMLElement) {
   });
 
   card.addEventListener("pointerleave", reset);
+}
 
-  REDUCED_MOTION.addEventListener("change", (event) => {
-    if (event.matches) reset();
+function initAll() {
+  document.querySelectorAll<HTMLElement>(".card-tilt").forEach((card) => {
+    // The guard lives on the element, so cards swapped in by the client
+    // router get initialized while surviving ones are not double-bound.
+    if (card.dataset.tiltBound) return;
+    card.dataset.tiltBound = "true";
+    initCard(card);
   });
 }
 
-document.querySelectorAll<HTMLElement>(".card-tilt").forEach(initCard);
+initAll();
+// Rebind after client-router navigations; this module only executes once.
+document.addEventListener("astro:page-load", initAll);

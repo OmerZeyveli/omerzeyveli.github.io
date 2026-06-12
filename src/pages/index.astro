@@ -14,6 +14,7 @@ import {
   getLatestWriting,
   getLatestReviews,
 } from "../lib/content";
+import { coverTransitionName } from "../lib/transitions";
 
 const featuredProjects = await getFeaturedProjects(3);
 const latestWriting = await getLatestWriting(3);
@@ -86,6 +87,7 @@ const latestReviews = await getLatestReviews(3);
               stack={project.data.stack}
               headingLevel="h3"
               sizes="(max-width: 768px) 100vw, 33vw"
+              transitionName={coverTransitionName("projects", project.id)}
             />
           ))}
         </div>
@@ -116,6 +118,7 @@ const latestReviews = await getLatestReviews(3);
                   category={post.data.category}
                   pubDate={post.data.pubDate}
                   headingLevel="h3"
+                  transitionName={coverTransitionName("writing", post.id)}
                 />
               ))}
             </div>
@@ -142,6 +145,7 @@ const latestReviews = await getLatestReviews(3);
                   type={review.data.type}
                   score={review.data.score}
                   headingLevel="h3"
+                  transitionName={coverTransitionName("reviews", review.id)}
                 />
               ))}
             </div>

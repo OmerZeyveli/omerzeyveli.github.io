@@ -50,8 +50,12 @@
 
 <script>
   const STORAGE_KEY = "riive:entry-mode";
-  const root = document.querySelector<HTMLElement>("[data-entry-gate]");
-  if (root) {
+
+  function initGate() {
+    const root = document.querySelector<HTMLElement>("[data-entry-gate]");
+    if (!root || root.dataset.bound) return;
+    root.dataset.bound = "true";
+
     let stored: string | null = null;
     try {
       stored = window.localStorage.getItem(STORAGE_KEY);
@@ -82,4 +86,8 @@
       .querySelector("[data-entry-gate-programmer]")
       ?.addEventListener("click", () => close("programmer"));
   }
+
+  initGate();
+  // Rebind when the client router swaps the homepage back in.
+  document.addEventListener("astro:page-load", initGate);
 </script>
