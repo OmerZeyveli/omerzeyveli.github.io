@@ -40,6 +40,9 @@ Hard goals:
 - Site config: `src/config/site.ts`
 - Global layout: `src/layouts/BaseLayout.astro`
 - Post layout: `src/layouts/PostLayout.astro`
+- Terminal shell: `src/layouts/TerminalLayout.astro` (chromeless, no client router)
+- Client behavior scripts: `src/scripts/`
+- View-transition names: `src/lib/transitions.ts`
 - Global styles: `src/styles/global.css`
 - Deploy workflow: `.github/workflows/deploy.yml`
 - Domain config: `astro.config.mjs` and `public/CNAME`
@@ -55,6 +58,7 @@ Hard goals:
 - `/reviews/[slug]` via `src/pages/reviews/[...slug].astro`
 - `/about`
 - `/404`
+- `/terminal` (noindex, chromeless shell for the "programmer" entry path)
 
 Rules:
 
@@ -124,6 +128,14 @@ Supported media components (v1):
 - `src/components/content/YouTubeEmbed.astro`
 
 Public-facing copy must remain English.
+
+Motion and view-transition rules:
+
+- `BaseLayout` enables the client router (`<ClientRouter />`); `TerminalLayout` intentionally does not — keep `/terminal` on full page loads.
+- Under the client router, module scripts execute once per session. Any DOM-binding script must rebind on `astro:page-load` with a per-element guard (pattern: `src/scripts/card-tilt.ts`).
+- Cover morphs pair listing cards with detail heroes via names from `src/lib/transitions.ts`. Names are applied at navigation time to exactly one card by `src/scripts/cover-morph.ts`. Never put a static `view-transition-name` on every card: named elements are snapshotted without ancestor effects (opacity, clipping), which makes untouched cards flash during transitions.
+- Pointer-driven effects stay gated behind `(hover: hover) and (pointer: fine)`; all motion respects `prefers-reduced-motion`.
+- Scroll-driven reveals animate `translate`/`opacity` only, so they compose with transform-based hover effects instead of overriding them.
 
 ## 8) SEO And Domain Contract
 

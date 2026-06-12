@@ -81,7 +81,14 @@ Syntax guidance:
 - Content schema: `src/content.config.ts`
 - Content helpers: `src/lib/content.ts`
 - Layouts: `src/layouts/BaseLayout.astro`, `src/layouts/PostLayout.astro`
+- Client behavior scripts: `src/scripts/`
 - MDX media: `src/components/content/Figure.astro`, `src/components/content/YouTubeEmbed.astro`
+
+Toolchain:
+
+- Package manager: pnpm (lockfile: `pnpm-lock.yaml`; install settings: `pnpm-workspace.yaml`)
+- Node: >= 24 (`package.json` engines)
+- Dev server: `pnpm dev` serves http://localhost:4321
 
 Canonical route behavior:
 
@@ -156,7 +163,7 @@ For templates, examples, and workflow depth, consult `docs/WORKFLOW_REFERENCE.md
 - Read this file at task start; apply routing and safety rules before editing code.
 - If the same type of wrong-path decision occurs twice during a session, propose a Domain Routing correction to the user before applying it.
 - Self-updates are limited to Domain Routing entries only. Safety rules, asset policies, and Definition of Done are never auto-editable.
-- Every AGENTS.md self-update must be logged in `docs/change-log-for-agents.md`.
+- Every AGENTS.md self-update must be logged in `docs/DECISIONS.md`.
 
 Update principles:
 
@@ -165,4 +172,3 @@ Update principles:
 - Reflect the actual project, not theory.
 - If a rule becomes ineffective or outdated, revise or remove it.
 - If AI repeatedly makes wrong decisions, the issue may be this file — not only the AI.
-  1

@@ -27,3 +27,5 @@ pnpm-debug.log*
 .idea/
 .vscode/settings.json
 .codex
+# Claude Code workspace state (machine-local tooling, not project source)
+.claude/
