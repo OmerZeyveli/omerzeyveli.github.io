@@ -98,13 +98,6 @@ const ogImage = cover ? new URL(cover.src, siteUrl).href : undefined;
 <script>
   import { navigate } from "astro:transitions/client";
 
-  // Tracks whether the visitor navigated here from within the site; direct
-  // visits fall back to the collection listing instead of leaving the site.
-  let hasInternalHistory = false;
-  document.addEventListener("astro:after-swap", () => {
-    hasInternalHistory = true;
-  });
-
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape" || event.defaultPrevented) return;
     if (!document.querySelector("[data-post-page]")) return;
@@ -118,7 +111,14 @@ const ogImage = cover ? new URL(cover.src, siteUrl).href : undefined;
       return;
     }
 
-    if (hasInternalHistory) {
+    // The client router records its position in history.state.index; a
+    // positive index means the previous entry is an in-site page, so going
+    // back follows the visitor's actual path (homepage or listing). Read at
+    // keypress time — an event-based flag misses the navigation that loads
+    // this module. Direct visits fall back to the collection listing.
+    const index =
+      typeof history.state?.index === "number" ? history.state.index : 0;
+    if (index > 0) {
       history.back();
     } else {
       const [collection] = location.pathname.split("/").filter(Boolean);
