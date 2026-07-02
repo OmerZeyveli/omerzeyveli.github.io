@@ -17,7 +17,12 @@ const { overline, title, href, linkText } = Astro.props;
 >
   <div>
     <p class="text-sm uppercase tracking-[0.2em] text-zinc-400">{overline}</p>
-    <h2 class="text-xl font-semibold tracking-tight sm:text-2xl">{title}</h2>
+    <h2
+      class="text-xl font-semibold tracking-tight sm:text-2xl"
+      data-ball-obstacle="text"
+    >
+      {title}
+    </h2>
   </div>
   <a
     href={href}

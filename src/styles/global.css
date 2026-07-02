@@ -236,3 +236,42 @@ a {
     translate: 0 0;
   }
 }
+
+/* Physics football easter egg (element created and driven by football.ts).
+   Desktop-only, grabbable toy: hidden outright for touch, coarse-pointer,
+   and reduced-motion contexts even if the script were ever to run there. */
+.football {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40; /* above content, below the sticky header and modals (z-50) */
+  width: 48px;
+  height: 48px;
+  /* Interactive on purpose since v3: the ball itself is the grab target.
+     It covers whatever sits underneath, so stolen hovers/clicks there are
+     an accepted trade. */
+  pointer-events: auto;
+  cursor: grab;
+  will-change: transform;
+  /* Own snapshot layer so the ball rides through view transitions live
+     instead of crossfading together with the rest of the page. */
+  view-transition-name: football;
+}
+
+.football.is-held {
+  /* A class, not :active — cursor re-resolution under pointer capture is
+     engine-inconsistent. */
+  cursor: grabbing;
+}
+
+.football svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .football {
+    display: none;
+  }
+}

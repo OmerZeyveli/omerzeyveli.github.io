@@ -31,12 +31,18 @@ const { type, score } = review.data;
   coverTransitionName={coverTransitionName("reviews", review.id)}
 >
   <div slot="meta" class="flex flex-wrap items-center gap-3 text-sm">
-    <span class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300">
+    <span
+      class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300"
+      data-ball-obstacle
+    >
       {type}
     </span>
     {
       score != null && (
-        <span class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300">
+        <span
+          class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300"
+          data-ball-obstacle
+        >
           {score}/10
         </span>
       )

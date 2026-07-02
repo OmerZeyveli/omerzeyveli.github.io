@@ -41,6 +41,7 @@ const ogImage = cover ? new URL(cover.src, siteUrl).href : undefined;
       <div class="space-y-3">
         <h1
           class="text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl"
+          data-ball-obstacle="text"
         >
           {title}
         </h1>
@@ -75,6 +76,7 @@ const ogImage = cover ? new URL(cover.src, siteUrl).href : undefined;
           <Image
             src={cover}
             alt={coverAlt}
+            data-ball-obstacle="platform"
             class="aspect-16/10 w-full rounded-2xl border border-zinc-800 object-cover sm:rounded-4xl"
             style={
               coverTransitionName &&
