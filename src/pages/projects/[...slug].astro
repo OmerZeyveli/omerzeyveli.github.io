@@ -34,18 +34,30 @@ const { year, status, category, stack, repoUrl, liveUrl } = project.data;
   coverTransitionName={coverTransitionName("projects", project.id)}
 >
   <div slot="meta" class="flex flex-wrap items-center gap-2 text-sm sm:gap-3">
-    <span class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300">
+    <span
+      class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300"
+      data-ball-obstacle
+    >
       {category}
     </span>
-    <span class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300">
+    <span
+      class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300"
+      data-ball-obstacle
+    >
       {year}
     </span>
-    <span class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300">
+    <span
+      class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300"
+      data-ball-obstacle
+    >
       {status}
     </span>
     {
       stack.map((item) => (
-        <span class="rounded-full border border-zinc-800 px-3 py-1 text-zinc-400">
+        <span
+          class="rounded-full border border-zinc-800 px-3 py-1 text-zinc-400"
+          data-ball-obstacle
+        >
           {item}
         </span>
       ))
@@ -55,6 +67,7 @@ const { year, status, category, stack, repoUrl, liveUrl } = project.data;
         <a
           href={repoUrl}
           class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300 transition-colors hover:bg-zinc-800"
+          data-ball-obstacle
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -67,6 +80,7 @@ const { year, status, category, stack, repoUrl, liveUrl } = project.data;
         <a
           href={liveUrl}
           class="rounded-full border border-zinc-700 px-3 py-1 text-zinc-300 transition-colors hover:bg-zinc-800"
+          data-ball-obstacle
           target="_blank"
           rel="noopener noreferrer"
         >
