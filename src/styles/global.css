@@ -245,11 +245,13 @@ a {
   top: 0;
   left: 0;
   z-index: 40; /* above content, below the sticky header and modals (z-50) */
-  width: 48px;
-  height: 48px;
-  /* Interactive on purpose since v3: the ball itself is the grab target.
-     It covers whatever sits underneath, so stolen hovers/clicks there are
-     an accepted trade. */
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  /* Interactive on purpose: the larger box makes the visual ball easier to
+     grab. It covers whatever sits underneath, so stolen hovers/clicks there
+     are an accepted trade. */
   pointer-events: auto;
   cursor: grab;
   will-change: transform;
@@ -266,8 +268,9 @@ a {
 
 .football svg {
   display: block;
-  width: 100%;
-  height: 100%;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
 }
 
 @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {

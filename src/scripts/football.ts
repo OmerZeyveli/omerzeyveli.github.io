@@ -1,5 +1,5 @@
 // Purpose: Physics-driven soccer ball easter egg that roams BaseLayout pages.
-// Scope: Viewport-fixed ball with gravity, one-way platforms, kicks, throws.
+// Scope: Viewport-fixed ball with gravity, one-way platforms, grab throws.
 // Audience: Desktop fine-pointer visitors without reduced-motion preference.
 
 // Marks the file as a module so its top-level names stay file-scoped for
@@ -10,7 +10,8 @@ const FINE_POINTER = window.matchMedia("(hover: hover) and (pointer: fine)");
 const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)");
 const STORAGE_KEY = "riive:football";
 
-const R = 24; // ball radius; the element is a 2R square
+const R = 24; // visual/physical ball radius
+const GRAB_R = 36; // larger element radius for easier pointer grabs
 const GRAVITY = 1400; // px/s^2
 const MAX_SPEED = 2600; // px/s hard cap; also bounds per-frame travel
 const DT_MAX = 0.032; // s; absorbs tab-switch and long-frame gaps
@@ -25,28 +26,10 @@ const AIR_DRAG = 0.06; // 1/s
 const GROUND_FRICTION = 1.0; // 1/s while resting on a surface
 const TANGENT_KEEP = 0.85; // tangential velocity kept through an impact
 
-const CURSOR_R = 40; // kicker circle around the pointer
-const CURSOR_REST = 0.45;
-const MIN_SEPARATION = 220; // px/s guaranteed exit speed from a moving cursor
-const CURSOR_VEL_ALPHA = 0.4; // EMA blend per pointermove sample
-const CURSOR_IDLE_MS = 80; // pointer still this long counts as not moving
-const WAKE_DIST = R + CURSOR_R + 80;
-
-const SCOOP_CURSOR_SPEED = 350; // px/s sweep speed that counts as a chip kick
-const SCOOP_BALL_SPEED = 200; // px/s the hit must impart before lift applies
-const SCOOP_LIFT = 0.6; // sin of the minimum launch angle (~31deg)
-
-const KICK_RANGE = 150; // px; a pointerdown further from the ball is ignored
-const KICK_POWER = 1250; // px/s at point-blank range
-const KICK_FALLOFF = 0.4; // fraction of power lost at max range
-const KICK_UP_BIAS = 0.5; // upward pull mixed into the kick direction
-
 const GRAB_STIFFNESS = 22; // 1/s spring rate of the held ball toward pointer
-const GRAB_OFFSET_DECAY = 4; // 1/s; the grab point relaxes under the pointer
-const SNEAK_SPEED = 200; // px/s; slower approach keeps a sleeping ball still
 const ONE_WAY_TOL = 6; // px slack in the was-above test of one-way platforms
 
-const PRESS_WINDOW = 1500; // ms after a throw/kick in which impacts press
+const PRESS_WINDOW = 1500; // ms after a throw in which impacts press
 const PRESS_MIN_SPEED = 500; // px/s impact speed needed to press a control
 const PRESS_SCALE = 0.92; // pressed-in scale applied to the hit control
 const PRESS_RESTORE_MS = 110; // ms before the control is restored and clicked
@@ -55,8 +38,7 @@ const SQUASH_MIN_VN = 400; // px/s impact speed before a squash pulse shows
 const SQUASH_MAX = 0.32; // max relative deformation
 const SQUASH_DECAY = 12; // 1/s exponential decay of the pulse
 const SQUASH_BULGE = 0.7; // sideways bulge relative to the compression
-const STRETCH_AMT = 0.25; // elongation pulse applied by a click kick
-const TEXT_MIN_FRAG = 8; // px; smaller text line fragments are ignored
+const STRETCH_AMT = 0.25; // elongation pulse applied by a grab throw
 
 const SLEEP_SPEED = 10; // px/s below which the ball may fall asleep
 const SLEEP_DELAY_MS = 300;
@@ -76,21 +58,10 @@ interface Rect {
   el: HTMLElement | null;
 }
 
-// Text line boxes cached as offsets from the owning element's rect; the
-// element rect is re-read every frame, so the lines ride scroll for free.
-interface LineOffset {
-  dx: number;
-  dy: number;
-  w: number;
-  h: number;
-}
-
-// lines === null means the element's own box collides (cards, buttons,
-// pills); an array means only the measured text lines do. oneWay boxes and
-// all text lines are platforms; solid interactive boxes are pressable.
+// Cards and explicit platform boxes are one-way; solid interactive boxes
+// are pressable when a thrown ball hits them.
 interface Obstacle {
   el: HTMLElement;
-  lines: LineOffset[] | null;
   oneWay: boolean;
   pressable: boolean;
 }
@@ -113,14 +84,10 @@ const s = {
   prevScrollY: 0,
   cursorX: -1e4,
   cursorY: -1e4,
-  cursorVX: 0,
-  cursorVY: 0,
-  cursorT: 0,
-  cursorGone: true,
 };
 
-// Impact deformation pulse: normal direction, magnitude, and polarity
-// (+1 squashes along the normal on impacts, -1 stretches on kicks).
+// Impact deformation pulse: normal direction, magnitude, and polarity.
+// Positive squashes along the normal; negative stretches on throws.
 const sq = {
   nx: 0,
   ny: -1,
@@ -128,16 +95,11 @@ const sq = {
   sign: 1,
 };
 
-// Grab-and-throw state. thrownUntil arms the button-press window (set by
-// both releases and click kicks); cursorMuted silences the kicker until the
-// ball leaves its shell so a release cannot be corrupted by an immediate
-// separation push from the still-overlapping pointer.
+// Grab-and-throw state. thrownUntil arms the button-press window after release,
+// so a thrown ball can still press controls it slams into.
 let grabbed = false;
 let grabPointerId = -1;
-let grabDx = 0;
-let grabDy = 0;
 let thrownUntil = 0;
-let cursorMuted = false;
 
 function clamp(value: number, lo: number, hi: number): number {
   return Math.min(Math.max(value, lo), hi);
@@ -178,15 +140,17 @@ function createBallEl(): HTMLElement {
   el.addEventListener("pointerdown", (event) => {
     if (!enabled || event.button !== 0) return;
     event.preventDefault();
+    trackPointer(event);
     grabbed = true;
     grabPointerId = event.pointerId;
     el.setPointerCapture(event.pointerId);
-    grabDx = s.x - event.clientX;
-    grabDy = s.y - event.clientY;
     s.vx = 0;
     s.vy = 0;
     el.classList.add("is-held");
     wake();
+  });
+  el.addEventListener("pointermove", (event) => {
+    if (grabbed && event.pointerId === grabPointerId) trackPointer(event);
   });
   el.addEventListener("pointerup", (event) => {
     if (grabbed && event.pointerId === grabPointerId) releaseGrab(true);
@@ -204,54 +168,28 @@ function headerBottom(): number {
   return HEADER_FALLBACK;
 }
 
-function measureTextLines(el: HTMLElement): LineOffset[] {
-  const base = el.getBoundingClientRect();
-  const range = document.createRange();
-  range.selectNodeContents(el);
-  const lines: LineOffset[] = [];
-  for (const r of Array.from(range.getClientRects())) {
-    // Template whitespace produces zero-size fragments; drop slivers.
-    if (r.width < TEXT_MIN_FRAG || r.height < TEXT_MIN_FRAG) continue;
-    lines.push({
-      dx: r.left - base.left,
-      dy: r.top - base.top,
-      w: r.width,
-      h: r.height,
-    });
-  }
-  return lines;
-}
-
 function rescan(): void {
   headerEl = document.querySelector("header");
   obstacles = [];
   document
     .querySelectorAll<HTMLElement>(".card-tilt, [data-ball-obstacle]")
     .forEach((el) => {
-      // The "text" flavor collides per measured text line, so block-level
-      // headings do not wall off the empty space around their glyphs.
       const flavor = el.dataset.ballObstacle;
-      const lines = flavor === "text" ? measureTextLines(el) : null;
-      // Text, cards, and "platform" boxes are one-way (land on top only);
-      // remaining solid boxes that are same-tab controls can be pressed by
-      // a thrown ball.
+      if (flavor === "text") return;
       const oneWay =
-        flavor === "text" ||
-        flavor === "platform" ||
-        el.classList.contains("card-tilt");
+        flavor === "platform" || el.classList.contains("card-tilt");
       const pressable =
         !oneWay &&
-        !lines &&
         el.matches("a, button") &&
         !(el instanceof HTMLAnchorElement && el.target === "_blank");
-      obstacles.push({ el, lines, oneWay, pressable });
+      obstacles.push({ el, oneWay, pressable });
     });
 }
 
 function render(): void {
   if (!ball) return;
-  const px = (s.x - R).toFixed(2);
-  const py = (s.y - R).toFixed(2);
+  const px = (s.x - GRAB_R).toFixed(2);
+  const py = (s.y - GRAB_R).toFixed(2);
   if (sq.amt === 0) {
     ball.style.transform = `translate3d(${px}px, ${py}px, 0) rotate(${s.angle.toFixed(4)}rad)`;
     return;
@@ -340,56 +278,6 @@ function pulseSquash(nx: number, ny: number, vn: number): void {
   sq.ny = ny;
   sq.amt = amt;
   sq.sign = 1;
-}
-
-function applyCursor(): void {
-  const minD = R + CURSOR_R;
-  const dx = s.x - s.cursorX;
-  const dy = s.y - s.cursorY;
-  const d2 = dx * dx + dy * dy;
-  if (d2 >= minD * minD) {
-    cursorMuted = false;
-    return;
-  }
-  // Muted right after a release: the pointer is still inside the shell and
-  // must not inject separation pushes into the throw it just made.
-  if (cursorMuted) return;
-  const d = Math.sqrt(d2);
-  const nx = d > 0.0001 ? dx / d : 0;
-  const ny = d > 0.0001 ? dy / d : -1;
-  s.x += nx * (minD - d);
-  s.y += ny * (minD - d);
-  // A pointer that has not moved recently acts as a static obstacle: it
-  // separates positionally but never flings, so a parked cursor cannot
-  // pin the ball against the floor into a bounce loop.
-  const idle = s.cursorGone || performance.now() - s.cursorT > CURSOR_IDLE_MS;
-  const kvx = idle ? 0 : s.cursorVX;
-  const kvy = idle ? 0 : s.cursorVY;
-  const vn = (s.vx - kvx) * nx + (s.vy - kvy) * ny;
-  if (vn < 0) {
-    s.vx -= nx * vn * (1 + CURSOR_REST);
-    s.vy -= ny * vn * (1 + CURSOR_REST);
-  }
-  if (!idle) {
-    // Guaranteed exit speed so a slow creep still visibly nudges the ball
-    // instead of dragging it along inside the kicker circle.
-    const sep = (s.vx - kvx) * nx + (s.vy - kvy) * ny;
-    if (sep < MIN_SEPARATION) {
-      s.vx += nx * (MIN_SEPARATION - sep);
-      s.vy += ny * (MIN_SEPARATION - sep);
-    }
-  }
-  if (!idle && s.supported) {
-    // Chip kick: a grounded ball leaves no room underneath for an upward
-    // approach, so a fast sweep lifts it to a minimum launch angle instead
-    // of just shoving it sideways. (s.supported still holds the previous
-    // substep's contact state here — collisions reset it afterwards.)
-    const cursorSpeed = Math.hypot(s.cursorVX, s.cursorVY);
-    const ballSpeed = Math.hypot(s.vx, s.vy);
-    if (cursorSpeed > SCOOP_CURSOR_SPEED && ballSpeed > SCOOP_BALL_SPEED) {
-      s.vy = -Math.max(ballSpeed * SCOOP_LIFT, -s.vy);
-    }
-  }
 }
 
 function collideWorld(w: number, h: number, top: number): void {
@@ -486,8 +374,8 @@ function collideObstacles(rects: Rect[], obstacleVy: number): void {
         thrownUntil !== 0 &&
         performance.now() < thrownUntil
       ) {
-        // A thrown or kicked ball presses the control it slams into; one
-        // press per throw, and a merely rolling ball never qualifies.
+        // A thrown ball presses the control it slams into; one press per
+        // throw, and a merely rolling ball never qualifies.
         thrownUntil = 0;
         pressEl(rect.el);
       }
@@ -523,7 +411,6 @@ function substep(
   const drag = Math.exp(-AIR_DRAG * dt);
   s.vx *= drag;
   s.vy *= drag;
-  applyCursor();
   s.x += s.vx * dt;
   s.y += s.vy * dt;
   s.supported = false;
@@ -564,20 +451,15 @@ function step(now: number): void {
   const scrollDelta = s.prevScrollY - scrollY;
   s.prevScrollY = scrollY;
   if (grabbed) {
-    // Held ball: spring toward the pointer, no gravity or collisions. The
-    // spring's tracked velocity is what a release throws with, and the
-    // clamped delta keeps drags along the viewport edge from storing a
-    // phantom fling.
+    // Held ball: spring its center toward the pointer, no gravity or
+    // collisions. The spring's tracked velocity is what a release throws
+    // with, and the clamped delta keeps drags along the viewport edge from
+    // storing a phantom fling.
     const k = 1 - Math.exp(-GRAB_STIFFNESS * dt);
-    const decay = Math.exp(-GRAB_OFFSET_DECAY * dt);
-    grabDx *= decay;
-    grabDy *= decay;
-    const targetX = s.cursorX + grabDx;
-    const targetY = s.cursorY + grabDy;
     const prevX = s.x;
     const prevY = s.y;
-    s.x = clamp(s.x + (targetX - s.x) * k, R, Math.max(w - R, R));
-    s.y = clamp(s.y + (targetY - s.y) * k, top + R, Math.max(h - R, top + R));
+    s.x = clamp(s.x + (s.cursorX - s.x) * k, R, Math.max(w - R, R));
+    s.y = clamp(s.y + (s.cursorY - s.y) * k, top + R, Math.max(h - R, top + R));
     if (dt > 0) {
       s.vx = (s.x - prevX) / dt;
       s.vy = (s.y - prevY) / dt;
@@ -602,8 +484,6 @@ function step(now: number): void {
   for (const ob of obstacles) {
     if (!ob.el.isConnected) continue;
     const b = ob.el.getBoundingClientRect();
-    // The element box bounds all of its line boxes, so it serves as the
-    // outer cull for both flavors.
     if (
       b.right < s.x - margin ||
       b.left > s.x + margin ||
@@ -612,50 +492,21 @@ function step(now: number): void {
     ) {
       continue;
     }
-    if (!ob.lines) {
-      rects.push({
-        left: b.left,
-        top: b.top,
-        right: b.right,
-        bottom: b.bottom,
-        oneWay: ob.oneWay,
-        pressable: ob.pressable,
-        el: ob.pressable ? ob.el : null,
-        // A platform whose top has scrolled into the header band cannot be
-        // stood on (the ceiling clamp would fight the landing), so it just
-        // stops catching and hands the ball to gravity.
-        wasAbove:
-          b.top >= top + 2 * R &&
-          frameBottom <= b.top - scrollDelta + ONE_WAY_TOL,
-      });
-      continue;
-    }
-    for (const ln of ob.lines) {
-      const lnLeft = b.left + ln.dx;
-      const lnTop = b.top + ln.dy;
-      const lnRight = lnLeft + ln.w;
-      const lnBottom = lnTop + ln.h;
-      if (
-        lnRight < s.x - margin ||
-        lnLeft > s.x + margin ||
-        lnBottom < s.y - margin ||
-        lnTop > s.y + margin
-      ) {
-        continue;
-      }
-      rects.push({
-        left: lnLeft,
-        top: lnTop,
-        right: lnRight,
-        bottom: lnBottom,
-        oneWay: true,
-        pressable: false,
-        el: null,
-        wasAbove:
-          lnTop >= top + 2 * R &&
-          frameBottom <= lnTop - scrollDelta + ONE_WAY_TOL,
-      });
-    }
+    rects.push({
+      left: b.left,
+      top: b.top,
+      right: b.right,
+      bottom: b.bottom,
+      oneWay: ob.oneWay,
+      pressable: ob.pressable,
+      el: ob.pressable ? ob.el : null,
+      // A platform whose top has scrolled into the header band cannot be
+      // stood on (the ceiling clamp would fight the landing), so it just
+      // stops catching and hands the ball to gravity.
+      wasAbove:
+        b.top >= top + 2 * R &&
+        frameBottom <= b.top - scrollDelta + ONE_WAY_TOL,
+    });
   }
   if (dt > 0) {
     const substeps = clamp(
@@ -733,7 +584,6 @@ function destroy(): void {
   grabbed = false;
   grabPointerId = -1;
   thrownUntil = 0;
-  cursorMuted = false;
   ball?.remove();
   ball = null;
   obstacles = [];
@@ -769,7 +619,6 @@ function releaseGrab(throwIt: boolean): void {
   }
   grabPointerId = -1;
   ball?.classList.remove("is-held");
-  cursorMuted = true;
   if (!throwIt) {
     s.vx = 0;
     s.vy = 0;
@@ -790,87 +639,20 @@ function releaseGrab(throwIt: boolean): void {
   }
 }
 
-document.addEventListener("pointermove", (event) => {
-  if (!enabled) return;
-  // performance.now(), not event.timeStamp: applyCursor compares cursorT
-  // against performance.now(), and synthetic events (DevTools, test
-  // drivers) may stamp on a different clock base, which would freeze the
-  // velocity estimate as permanently "idle".
-  const now = performance.now();
-  if (s.cursorGone) {
-    // Re-entry after leaving the viewport: seed the position without a
-    // velocity spike from the huge positional jump.
-    s.cursorGone = false;
-    s.cursorVX = 0;
-    s.cursorVY = 0;
-  } else {
-    const dtm = Math.max(now - s.cursorT, 4) / 1000;
-    const ivx = (event.clientX - s.cursorX) / dtm;
-    const ivy = (event.clientY - s.cursorY) / dtm;
-    s.cursorVX += (ivx - s.cursorVX) * CURSOR_VEL_ALPHA;
-    s.cursorVY += (ivy - s.cursorVY) * CURSOR_VEL_ALPHA;
-  }
+function trackPointer(event: PointerEvent): void {
   s.cursorX = event.clientX;
   s.cursorY = event.clientY;
-  s.cursorT = now;
-  if (!rafId) {
-    const dx = event.clientX - s.x;
-    const dy = event.clientY - s.y;
-    // A slow approach leaves the sleeping ball in place so the pointer can
-    // actually reach and grab it; deliberate sweeps wake it as before.
-    if (
-      dx * dx + dy * dy < WAKE_DIST * WAKE_DIST &&
-      Math.hypot(s.cursorVX, s.cursorVY) > SNEAK_SPEED
-    ) {
-      wake();
-    }
-  }
+}
+
+document.addEventListener("pointermove", (event) => {
+  if (!enabled) return;
+  trackPointer(event);
 });
 
 document.addEventListener("pointerleave", () => {
-  s.cursorGone = true;
+  if (grabbed) return;
   s.cursorX = -1e4;
   s.cursorY = -1e4;
-  s.cursorVX = 0;
-  s.cursorVY = 0;
-});
-
-// Click kick: a deliberate shot on empty space near the ball. Interactive
-// targets (and the entry-gate dialog) are skipped up front, so links and
-// buttons behave exactly as if the ball did not exist.
-document.addEventListener("pointerdown", (event) => {
-  if (!enabled || !ball || event.button !== 0) return;
-  const target = event.target;
-  // Pointerdowns on the ball are the grab gesture (the ball's own listener
-  // handles them); never also kick.
-  if (target instanceof Node && ball.contains(target)) return;
-  if (
-    target instanceof Element &&
-    target.closest(
-      "a, button, input, select, textarea, [role='button'], [role='dialog']",
-    )
-  ) {
-    return;
-  }
-  const dx = s.x - event.clientX;
-  const dy = s.y - event.clientY;
-  const d = Math.hypot(dx, dy);
-  if (d > KICK_RANGE) return;
-  const power = KICK_POWER * (1 - KICK_FALLOFF * (d / KICK_RANGE));
-  let nx = d > 0.0001 ? dx / d : 0;
-  let ny = d > 0.0001 ? dy / d : -1;
-  ny -= KICK_UP_BIAS;
-  const m = Math.hypot(nx, ny);
-  nx /= m;
-  ny /= m;
-  s.vx = nx * power;
-  s.vy = ny * power;
-  thrownUntil = performance.now() + PRESS_WINDOW;
-  sq.nx = nx;
-  sq.ny = ny;
-  sq.amt = STRETCH_AMT;
-  sq.sign = -1;
-  wake();
 });
 
 // Release is handled at the document level, independent of pointer capture:
@@ -944,11 +726,5 @@ window.addEventListener("pagehide", saveState);
 
 FINE_POINTER.addEventListener("change", applyCapability);
 REDUCED_MOTION.addEventListener("change", applyCapability);
-
-// Late font loads rewrap text lines; re-measure once fonts settle. The site
-// currently ships the system font stack, so this resolves immediately.
-void document.fonts.ready.then(() => {
-  if (enabled) rescan();
-});
 
 applyCapability();
