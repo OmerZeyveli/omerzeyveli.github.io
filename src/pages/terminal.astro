@@ -85,6 +85,13 @@ const author = siteConfig.name;
     const STORAGE_KEY = "riive:entry-mode";
     const collections = ["projects", "writing", "reviews"];
     const NIM_START_HEAPS = [1, 3, 5, 7];
+    const NIM_PC_DELAY_MS = 1000;
+    const NIM_STATES = {
+      SELECTING_STARTER: "selecting-starter",
+      PLAYER_TURN: "player-turn",
+      PC_THINKING: "pc-thinking",
+      ENDED: "ended",
+    };
 
     const term = document.getElementById("term");
     const output = document.getElementById("term-output");
@@ -196,7 +203,12 @@ const author = siteConfig.name;
 
     const createNimGame = () => ({
       heaps: [...NIM_START_HEAPS],
-      started: false,
+      state: NIM_STATES.SELECTING_STARTER,
+      starter: null,
+      starterSelection: "user",
+      pcHasMoved: false,
+      pcTimeoutId: null,
+      starterMenuLine: null,
     });
 
     const nimTotal = (heaps) => heaps.reduce((total, heap) => total + heap, 0);
@@ -251,10 +263,52 @@ const author = siteConfig.name;
       );
     };
 
+    const chooseRandomNimMove = (heaps) => {
+      const moves = nimLegalMoves(heaps);
+      return moves[Math.floor(Math.random() * moves.length)] ?? null;
+    };
+
+    const chooseNimComputerMove = () => {
+      if (!nimGame) return null;
+      if (nimGame.starter === "pc" && !nimGame.pcHasMoved) {
+        return chooseRandomNimMove(nimGame.heaps);
+      }
+      return chooseNimBotMove(nimGame.heaps);
+    };
+
     const formatNimStones = (count) => (count === 0 ? "-" : "#".repeat(count));
 
+    const renderNimStarterMenu = () => {
+      if (!nimGame) return "";
+      return [
+        "choose who starts:",
+        `${nimGame.starterSelection === "user" ? ">" : " "} user`,
+        `${nimGame.starterSelection === "pc" ? ">" : " "} pc`,
+      ].join("\n");
+    };
+
     const printNimStarterHelp = () => {
-      print("choose who starts: user or pc");
+      if (!nimGame) return;
+      if (nimGame.starterMenuLine?.isConnected) {
+        nimGame.starterMenuLine.textContent = renderNimStarterMenu();
+        return;
+      }
+      const line = document.createElement("div");
+      line.textContent = renderNimStarterMenu();
+      output.appendChild(line);
+      nimGame.starterMenuLine = line;
+    };
+
+    const isSelectingNimStarter = () =>
+      nimGame?.state === NIM_STATES.SELECTING_STARTER;
+
+    const toggleNimStarterSelection = () => {
+      if (!isSelectingNimStarter()) return false;
+      nimGame.starterSelection =
+        nimGame.starterSelection === "user" ? "pc" : "user";
+      printNimStarterHelp();
+      scrollToBottom();
+      return true;
     };
 
     const normalizeNimStarter = (value) => {
@@ -283,36 +337,71 @@ const author = siteConfig.name;
       print("  exit            leave the terminal");
     };
 
+    const clearNimComputerTimeout = (game = nimGame) => {
+      if (!game?.pcTimeoutId) return;
+      window.clearTimeout(game.pcTimeoutId);
+      game.pcTimeoutId = null;
+    };
+
+    const leaveNim = (message) => {
+      clearNimComputerTimeout();
+      nimGame = null;
+      if (message) print(message);
+    };
+
     const finishNim = (message, className) => {
+      if (nimGame) {
+        clearNimComputerTimeout();
+        nimGame.state = NIM_STATES.ENDED;
+      }
       print(message, className);
       nimGame = null;
     };
 
     const playNimComputerTurn = () => {
       if (!nimGame) return;
-      const computerMove = chooseNimBotMove(nimGame.heaps);
+      clearNimComputerTimeout();
+      const computerMove = chooseNimComputerMove();
       if (!computerMove) {
         finishNim("pc wins.", "text-rose-400");
         return;
       }
       nimGame.heaps = computerMove.next;
+      nimGame.pcHasMoved = true;
       print(`pc takes ${computerMove.count} from heap ${computerMove.heap}.`);
       if (nimTotal(nimGame.heaps) === 0) {
         finishNim("you win.", "text-emerald-400");
         return;
       }
+      nimGame.state = NIM_STATES.PLAYER_TURN;
       printNimBoard();
+    };
+
+    const scheduleNimComputerTurn = () => {
+      if (!nimGame) return;
+      clearNimComputerTimeout();
+      const game = nimGame;
+      game.state = NIM_STATES.PC_THINKING;
+      game.pcTimeoutId = window.setTimeout(() => {
+        if (nimGame !== game || game.state !== NIM_STATES.PC_THINKING) return;
+        game.pcTimeoutId = null;
+        playNimComputerTurn();
+        renderPrefix();
+        scrollToBottom();
+      }, NIM_PC_DELAY_MS);
     };
 
     const chooseNimStarter = (starter) => {
       if (!nimGame) return false;
       const normalizedStarter = normalizeNimStarter(starter);
       if (!normalizedStarter) return false;
-      nimGame.started = true;
+      nimGame.starter = normalizedStarter;
       if (normalizedStarter === "user") {
+        nimGame.state = NIM_STATES.PLAYER_TURN;
         print("you start.");
         printNimBoard();
       } else {
+        nimGame.state = NIM_STATES.PC_THINKING;
         print("pc starts.");
         playNimComputerTurn();
       }
@@ -320,12 +409,13 @@ const author = siteConfig.name;
     };
 
     const startNim = (args = []) => {
+      clearNimComputerTimeout();
       nimGame = createNimGame();
       print("nim: take stones from one row. Last stone loses.");
       printNimHelp();
       printNimBoard();
       if (args[0]) {
-        chooseNimStarter(args[0]);
+        if (!chooseNimStarter(args[0])) printNimStarterHelp();
         return;
       }
       printNimStarterHelp();
@@ -338,6 +428,7 @@ const author = siteConfig.name;
         return;
       }
       if (name === "restart") {
+        clearNimComputerTimeout();
         nimGame = createNimGame();
         print("nim restarted.");
         printNimHelp();
@@ -346,14 +437,17 @@ const author = siteConfig.name;
         return;
       }
       if (name === "quit") {
-        nimGame = null;
-        print("left nim.");
+        leaveNim("left nim.");
         return;
       }
-      if (!nimGame.started) {
+      if (nimGame.state === NIM_STATES.SELECTING_STARTER) {
         if (!chooseNimStarter(name)) {
           printNimStarterHelp();
         }
+        return;
+      }
+      if (nimGame.state === NIM_STATES.PC_THINKING) {
+        print("wait for pc.");
         return;
       }
 
@@ -396,7 +490,7 @@ const author = siteConfig.name;
         return;
       }
 
-      playNimComputerTurn();
+      scheduleNimComputerTurn();
     };
 
     const commands = {
@@ -433,6 +527,7 @@ const author = siteConfig.name;
       },
 
       exit() {
+        clearNimComputerTimeout();
         try {
           window.localStorage.setItem(STORAGE_KEY, "human");
         } catch {
@@ -586,17 +681,23 @@ const author = siteConfig.name;
       printHTML(
         `<span class="text-emerald-400">${escapeHTML(promptLabel())}</span> ${escapeHTML(raw)}`,
       );
-      if (!trimmed) return;
+      if (!trimmed) {
+        if (isSelectingNimStarter()) {
+          chooseNimStarter(nimGame.starterSelection);
+        }
+        return;
+      }
       const [name, ...args] = trimmed.split(/\s+/);
       if (nimGame) {
         if (name === "exit") {
+          clearNimComputerTimeout();
           commands.exit(args);
           return;
         }
         if (name === "clear") {
           commands.clear();
           printNimBoard();
-          if (!nimGame.started) printNimStarterHelp();
+          if (isSelectingNimStarter()) printNimStarterHelp();
           return;
         }
         handleNimInput(name, args);
@@ -633,6 +734,10 @@ const author = siteConfig.name;
         return;
       }
       if (event.key === "ArrowUp") {
+        if (toggleNimStarterSelection()) {
+          event.preventDefault();
+          return;
+        }
         if (history.length === 0) return;
         event.preventDefault();
         if (historyIndex === history.length) draft = input.value;
@@ -642,6 +747,10 @@ const author = siteConfig.name;
         return;
       }
       if (event.key === "ArrowDown") {
+        if (toggleNimStarterSelection()) {
+          event.preventDefault();
+          return;
+        }
         if (history.length === 0) return;
         event.preventDefault();
         historyIndex = Math.min(history.length, historyIndex + 1);
@@ -654,7 +763,7 @@ const author = siteConfig.name;
         event.preventDefault();
         commands.clear();
         if (nimGame) printNimBoard();
-        if (nimGame && !nimGame.started) printNimStarterHelp();
+        if (isSelectingNimStarter()) printNimStarterHelp();
       }
     });
 
