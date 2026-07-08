@@ -84,6 +84,7 @@ const author = siteConfig.name;
   <script is:inline define:vars={{ fs, author }}>
     const STORAGE_KEY = "riive:entry-mode";
     const collections = ["projects", "writing", "reviews"];
+    const NIM_START_HEAPS = [1, 3, 5, 7];
 
     const term = document.getElementById("term");
     const output = document.getElementById("term-output");
@@ -96,12 +97,16 @@ const author = siteConfig.name;
     }
 
     let cwd = "/";
+    let nimGame = null;
     const history = [];
     let historyIndex = -1;
     let draft = "";
 
+    const promptLabel = () =>
+      nimGame ? "visitor@riive:nim$" : `visitor@riive:${cwd}$`;
+
     const renderPrefix = () => {
-      prefix.textContent = `visitor@riive:${cwd}$`;
+      prefix.textContent = promptLabel();
     };
 
     const print = (text = "", className = "") => {
@@ -189,6 +194,211 @@ const author = siteConfig.name;
     const findEntry = (collection, slug) =>
       fs[collection]?.find((entry) => entry.slug === slug) ?? null;
 
+    const createNimGame = () => ({
+      heaps: [...NIM_START_HEAPS],
+      started: false,
+    });
+
+    const nimTotal = (heaps) => heaps.reduce((total, heap) => total + heap, 0);
+
+    const nimLegalMoves = (heaps) => {
+      const moves = [];
+      for (const [index, heap] of heaps.entries()) {
+        for (let count = 1; count <= heap; count += 1) {
+          const next = [...heaps];
+          next[index] -= count;
+          moves.push({ heap: index + 1, count, next });
+        }
+      }
+      return moves;
+    };
+
+    const nimStateKey = (heaps) => heaps.join(",");
+
+    const isNimWinningState = (heaps, memo = new Map()) => {
+      const key = nimStateKey(heaps);
+      if (memo.has(key)) return memo.get(key);
+      const moves = nimLegalMoves(heaps);
+      if (moves.length === 0) {
+        memo.set(key, true);
+        return true;
+      }
+      const winning = moves.some((move) => !isNimWinningState(move.next, memo));
+      memo.set(key, winning);
+      return winning;
+    };
+
+    const chooseNimBotMove = (heaps) => {
+      const memo = new Map();
+      return (
+        nimLegalMoves(heaps)
+          .map((move) => ({
+            ...move,
+            isWinningMove: !isNimWinningState(move.next, memo),
+            playerWinningReplies: nimLegalMoves(move.next).filter(
+              (reply) => !isNimWinningState(reply.next, memo),
+            ).length,
+            remaining: nimTotal(move.next),
+          }))
+          .sort(
+            (a, b) =>
+              Number(b.isWinningMove) - Number(a.isWinningMove) ||
+              a.playerWinningReplies - b.playerWinningReplies ||
+              b.remaining - a.remaining ||
+              a.heap - b.heap ||
+              a.count - b.count,
+          )[0] ?? null
+      );
+    };
+
+    const formatNimStones = (count) => (count === 0 ? "-" : "#".repeat(count));
+
+    const printNimStarterHelp = () => {
+      print("choose who starts: user or pc");
+    };
+
+    const normalizeNimStarter = (value) => {
+      const starter = value.toLowerCase();
+      if (starter === "user" || starter === "me") return "user";
+      if (starter === "pc" || starter === "computer" || starter === "bot") {
+        return "pc";
+      }
+      return null;
+    };
+
+    const printNimBoard = () => {
+      if (!nimGame) return;
+      print("board:", "text-emerald-400");
+      for (const [index, heap] of nimGame.heaps.entries()) {
+        print(`  ${index + 1}: ${formatNimStones(heap)} (${heap})`);
+      }
+    };
+
+    const printNimHelp = () => {
+      print("nim commands:", "text-emerald-400");
+      print("  user | pc       choose who starts");
+      print("  <heap> <count>  take stones, e.g. 1 2");
+      print("  restart         reset the board");
+      print("  quit            return to the shell");
+      print("  exit            leave the terminal");
+    };
+
+    const finishNim = (message, className) => {
+      print(message, className);
+      nimGame = null;
+    };
+
+    const playNimComputerTurn = () => {
+      if (!nimGame) return;
+      const computerMove = chooseNimBotMove(nimGame.heaps);
+      if (!computerMove) {
+        finishNim("pc wins.", "text-rose-400");
+        return;
+      }
+      nimGame.heaps = computerMove.next;
+      print(`pc takes ${computerMove.count} from heap ${computerMove.heap}.`);
+      if (nimTotal(nimGame.heaps) === 0) {
+        finishNim("you win.", "text-emerald-400");
+        return;
+      }
+      printNimBoard();
+    };
+
+    const chooseNimStarter = (starter) => {
+      if (!nimGame) return false;
+      const normalizedStarter = normalizeNimStarter(starter);
+      if (!normalizedStarter) return false;
+      nimGame.started = true;
+      if (normalizedStarter === "user") {
+        print("you start.");
+        printNimBoard();
+      } else {
+        print("pc starts.");
+        playNimComputerTurn();
+      }
+      return true;
+    };
+
+    const startNim = (args = []) => {
+      nimGame = createNimGame();
+      print("nim: take stones from one row. Last stone loses.");
+      printNimHelp();
+      printNimBoard();
+      if (args[0]) {
+        chooseNimStarter(args[0]);
+        return;
+      }
+      printNimStarterHelp();
+    };
+
+    const handleNimInput = (name, args) => {
+      if (!nimGame) return;
+      if (name === "help") {
+        printNimHelp();
+        return;
+      }
+      if (name === "restart") {
+        nimGame = createNimGame();
+        print("nim restarted.");
+        printNimHelp();
+        printNimBoard();
+        printNimStarterHelp();
+        return;
+      }
+      if (name === "quit") {
+        nimGame = null;
+        print("left nim.");
+        return;
+      }
+      if (!nimGame.started) {
+        if (!chooseNimStarter(name)) {
+          printNimStarterHelp();
+        }
+        return;
+      }
+
+      const values = [name, ...args];
+      if (
+        values.length !== 2 ||
+        !values.every((value) => /^\d+$/.test(value))
+      ) {
+        print("nim: enter a move as <heap> <count>, e.g. 1 2. Type help.");
+        return;
+      }
+
+      const heap = Number(values[0]);
+      const count = Number(values[1]);
+      const current = nimGame.heaps[heap - 1];
+      if (heap < 1 || heap > nimGame.heaps.length) {
+        print(`nim: heap must be between 1 and ${nimGame.heaps.length}.`);
+        return;
+      }
+      if (current === 0) {
+        print(`nim: heap ${heap} is empty.`);
+        return;
+      }
+      if (count < 1 || count > current) {
+        print(`nim: take between 1 and ${current} from heap ${heap}.`);
+        return;
+      }
+
+      const playerMove = {
+        heap,
+        count,
+        next: nimGame.heaps.map((value, index) =>
+          index === heap - 1 ? value - count : value,
+        ),
+      };
+      nimGame.heaps = playerMove.next;
+      print(`you take ${playerMove.count} from heap ${playerMove.heap}.`);
+      if (nimTotal(nimGame.heaps) === 0) {
+        finishNim("pc wins.", "text-rose-400");
+        return;
+      }
+
+      playNimComputerTurn();
+    };
+
     const commands = {
       help() {
         print("available commands:", "text-emerald-400");
@@ -198,6 +408,7 @@ const author = siteConfig.name;
           ["cd <dir>", "change directory (use .. or / or ~)"],
           ["pwd", "print working directory"],
           ["open <slug>", "open an entry in a new tab"],
+          ["nim", "play Nim against the computer"],
           ["whoami", "you tell me"],
           ["clear", "clear the screen"],
           ["exit", "leave the terminal"],
@@ -305,6 +516,10 @@ const author = siteConfig.name;
         );
         window.open(url, "_blank", "noopener,noreferrer");
       },
+
+      nim(args) {
+        startNim(args);
+      },
     };
 
     commands.gui = commands.exit;
@@ -330,6 +545,7 @@ const author = siteConfig.name;
     };
 
     const handleTab = () => {
+      if (nimGame) return;
       const value = input.value;
       const parts = value.split(/\s+/);
       if (parts.length < 2) return;
@@ -368,10 +584,24 @@ const author = siteConfig.name;
     const run = (raw) => {
       const trimmed = raw.trim();
       printHTML(
-        `<span class="text-emerald-400">visitor@riive:${escapeHTML(cwd)}$</span> ${escapeHTML(raw)}`,
+        `<span class="text-emerald-400">${escapeHTML(promptLabel())}</span> ${escapeHTML(raw)}`,
       );
       if (!trimmed) return;
       const [name, ...args] = trimmed.split(/\s+/);
+      if (nimGame) {
+        if (name === "exit") {
+          commands.exit(args);
+          return;
+        }
+        if (name === "clear") {
+          commands.clear();
+          printNimBoard();
+          if (!nimGame.started) printNimStarterHelp();
+          return;
+        }
+        handleNimInput(name, args);
+        return;
+      }
       const cmd = commands[name];
       if (!cmd) {
         print(`${name}: command not found. type 'help'.`);
@@ -423,6 +653,8 @@ const author = siteConfig.name;
       if (event.key === "l" && event.ctrlKey) {
         event.preventDefault();
         commands.clear();
+        if (nimGame) printNimBoard();
+        if (nimGame && !nimGame.started) printNimStarterHelp();
       }
     });
 
