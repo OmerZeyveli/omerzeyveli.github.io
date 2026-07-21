@@ -66,8 +66,9 @@
 - Listing routes remain `/projects`, `/writing`, and `/reviews`.
 - Detail routes remain catch-all `[...slug].astro` files inside each collection
   route directory.
-- Keep route components thin: query through `src/lib/content.ts`, render through
-  layouts/components, and return `[]` from `getStaticPaths()` when unpublished.
+- Keep route components thin: use `src/lib/content.ts` for shared listing queries
+  and sorting, render through layouts/components, and apply the same publication
+  filters in detail-route `getStaticPaths()`.
 
 ## Client Behavior
 
