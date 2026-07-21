@@ -1,174 +1,97 @@
-<!-- AGENTS policy root -->
-<!-- Scope: entire repository -->
-<!-- Audience: autonomous coding agents only -->
-
 # AGENTS.md
 
-## 0. Governance Model
+## Purpose and Workflow
 
-Model: Level 2 Balanced (global policy + scoped policy + map + decision log).
+- This file is the only canonical project-specific contract for agentic work.
+- Direct user instructions take precedence; otherwise follow this contract.
+- Keep this file focused on stable project facts, boundaries, locations, and
+  quality gates.
+- Applicable installed Superpowers skills own the development process. Read and
+  follow them for brainstorming, planning, implementation, review, debugging,
+  and verification instead of copying their workflows here.
+- Store approved design specs in `docs/superpowers/specs/` and executable plans
+  in `docs/superpowers/plans/`.
+- Git history plus the approved design specs replace a separate governance
+  decision log.
 
-## 1. Authority Order
+## Project and Stack
 
-Apply rules in this exact order:
+- This is a static-first personal site built with Astro 6, TypeScript, MDX, and
+  Tailwind CSS v4.
+- Prefer Astro components. Use React only for isolated interactive islands.
+- Use pnpm and Node.js 24 or newer; respect `pnpm-lock.yaml` and
+  `pnpm-workspace.yaml`.
+- GitHub Pages deploys the production build through the repository workflow.
+- The production domain is defined by `astro.config.mjs` and `public/CNAME`;
+  keep both sources aligned.
+- `pnpm dev` serves the local site at `http://localhost:4321`.
 
-1. Direct user request
-2. Root policy: `AGENTS.md`
-3. Scoped policy files listed in `docs/AGENT_MAP.md`
-4. Architecture contract: `ARCHITECTURE.md`
-5. Operational reference: `docs/WORKFLOW_REFERENCE.md`
+## Source Map
 
-Conflict rule:
+- Routes and page entry points: `src/pages/`.
+- Content entries: `src/content/{projects,writing,reviews}/`.
+- Entry media: `src/assets/content/<collection>/<slug>/`.
+- Collection schemas and loaders: `src/content.config.ts`.
+- Public collection queries and sorting: `src/lib/content.ts`.
+- Shared page shells: `src/layouts/`.
+- Reusable UI and MDX media: `src/components/`.
+- Browser behavior and navigation coordination: `src/scripts/`.
+- Global design tokens, utilities, and motion rules: `src/styles/global.css`.
+- GitHub Pages build and deployment: `.github/workflows/deploy.yml`.
 
-- If two policy files conflict, higher authority wins.
-- Scoped policies may add restrictions but may not weaken root hard constraints.
+## Hard Constraints
 
-## 2. Objective Function
-
-Optimize in this order:
-
-1. Correctness
-2. Architectural consistency
-3. Maintainability
-4. Readability
-5. Visual polish
-6. Additional features
-
-## 3. Root Hard Constraints
-
-- Keep architecture static-first; do not introduce backend runtime.
-- Do not add CMS, auth, comments, or database assumptions.
-- Collection naming standard is `writing`.
-- Keep content in `src/content/*`; do not move content into `src/pages/*`.
-- Keep assets in `src/assets/content/<collection>/<slug>/`.
-- Prefer `.astro` components; use React only for isolated interactivity.
-- Do not add dependencies without clear, task-specific need.
+- Keep the architecture static-first. Do not introduce a backend runtime, CMS,
+  authentication, comments, or database assumptions.
+- Keep authored content in `src/content/`; do not move it into `src/pages/`.
+- Keep entry assets in `src/assets/content/<collection>/<slug>/`.
+- Use `writing` as the collection name.
+- Do not add a dependency without a clear, task-specific need.
 - Keep public-facing copy in English.
+- Preserve accessibility, semantic HTML, keyboard support, meaningful alt text,
+  SEO metadata, canonical URLs, and sitemap behavior.
+- Preserve reduced-motion handling, responsive images, lazy loading where
+  appropriate, and static performance.
+- Keep changes minimal and scoped; do not mix unrelated cleanup into a task.
 
-Terminology rule:
+## Content and Routing
 
-- Do not spam repetitive naming reminders in every file.
-- Keep naming normalization centralized in root/scoped policy only.
+- Every entry requires a local `cover` image and meaningful `coverAlt` text.
+- Define collections in `src/content.config.ts` with explicit Astro Zod schemas
+  using `z` from `astro/zod`; use explicit validators, including `z.url()` for
+  URLs.
+- Public projects and reviews exclude entries where `data.archived` is true.
+- Public writing excludes entries where `data.draft` or `data.archived` is true.
+- Sort public collection results newest first by `pubDate`.
+- Listing routes remain `/projects`, `/writing`, and `/reviews`.
+- Detail routes remain catch-all `[...slug].astro` files inside each collection
+  route directory.
+- Keep route components thin: query through `src/lib/content.ts`, render through
+  layouts/components, and return `[]` from `getStaticPaths()` when unpublished.
 
-## 4. Mandatory Source-File Header Rule
+## Client Behavior
 
-For every created or modified source/code file, add a 3-line top-of-file explanatory header.
+- `src/layouts/BaseLayout.astro` owns `ClientRouter`; do not add it to
+  `src/layouts/TerminalLayout.astro`, which intentionally uses full page loads.
+- DOM bindings affected by client-router swaps must initialize and rebind on
+  `astro:page-load`, with per-element `data-*` guards against duplicate binding.
+- Repeated card covers must never receive a static `view-transition-name`.
+- Keep cover morph coordination in `src/scripts/cover-morph.ts` and shared name
+  generation in `src/lib/transitions.ts`; name only the matching cover during
+  navigation.
+- Gate pointer-driven effects behind `(hover: hover) and (pointer: fine)` and
+  respect `prefers-reduced-motion` in CSS and browser scripts.
 
-Scope of enforcement:
+## Quality Gates
 
-- required for code and executable/config source files
-- not required for Markdown documentation files (`*.md`)
-
-Header requirements:
-
-- exactly 3 lines
-- describes file purpose/scope/audience
-- uses valid syntax for that file type
-- must be placed at the top of the file (with Astro frontmatter exception below)
-
-Syntax guidance:
-
-- HTML: `<!-- ... -->`
-- Astro: start file with frontmatter and put exactly 3 `// ...` comment lines immediately after the opening `---` delimiter (treated as top-of-file for Astro)
-- TS/JS/CSS: `/* ... */` or `// ...`
-- Python/shell: `# ...`
-- JSON: if pure JSON cannot contain comments, use a sidecar `<file>.comment.md` entry in same folder.
-
-## 5. Repository Contract
-
-- Routes: `src/pages/`
-- Content: `src/content/projects/`, `src/content/writing/`, `src/content/reviews/`
-- Content schema: `src/content.config.ts`
-- Content helpers: `src/lib/content.ts`
-- Layouts: `src/layouts/BaseLayout.astro`, `src/layouts/PostLayout.astro`
-- Client behavior scripts: `src/scripts/`
-- MDX media: `src/components/content/Figure.astro`, `src/components/content/YouTubeEmbed.astro`
-
-Toolchain:
-
-- Package manager: pnpm (lockfile: `pnpm-lock.yaml`; install settings: `pnpm-workspace.yaml`)
-- Node: >= 24 (`package.json` engines)
-- Dev server: `pnpm dev` serves http://localhost:4321
-
-Canonical route behavior:
-
-- listing routes: `/projects`, `/writing`, `/reviews`
-- detail routes: catch-all files (`[...slug].astro`)
-
-## 6. Data And Schema Contract
-
-Public data filtering must enforce:
-
-```ts
-projects: !data.archived;
-writing: !data.draft && !data.archived;
-reviews: !data.archived;
-```
-
-Sorting default:
-
-- newest first by `pubDate`
-
-Schema requirements in `src/content.config.ts`:
-
-- use `z` from `astro/zod`
-- use explicit validators
-- use explicit URL validation (`z.url()` preferred)
-- keep cover image + alt text required for all entries
-
-## 7. Execution Protocol
-
-For each non-trivial task:
-
-1. Inspect affected files and adjacent contracts.
-2. Implement minimal, scoped edits.
-3. Keep naming and folder conventions consistent.
-4. Validate with required checks.
-5. Report exactly what changed and why.
-
-Required checks before completion:
-
-```bash
-pnpm format
-pnpm check
-pnpm build
-```
-
-## 8. Completion Criteria
-
-A task is complete only if all statements are true:
-
-- requested behavior is implemented
-- no architecture contract violation exists
-- required checks pass (or failure is reported with cause)
-- changed files remain consistent with policy hierarchy
-- file-header rule is satisfied for all touched files
-
-## 9. Policy Topology
-
-Use `docs/AGENT_MAP.md` as the canonical index of all scoped policy files.
-
-Any new scoped policy file must be added to the map in the same change.
-
-## 10. Policy Change Logging
-
-Any rule-level governance change must append a record to `docs/DECISIONS.md`.
-
-## 11. Optional Context Source
-
-For templates, examples, and workflow depth, consult `docs/WORKFLOW_REFERENCE.md`.
-
-## 12. Behavior: Self-Update Rules
-
-- Read this file at task start; apply routing and safety rules before editing code.
-- If the same type of wrong-path decision occurs twice during a session, propose a Domain Routing correction to the user before applying it.
-- Self-updates are limited to Domain Routing entries only. Safety rules, asset policies, and Definition of Done are never auto-editable.
-- Every AGENTS.md self-update must be logged in `docs/DECISIONS.md`.
-
-Update principles:
-
-- Prefer short bullets over prose.
-- Use real folder, file, and class names — no generic examples.
-- Reflect the actual project, not theory.
-- If a rule becomes ineffective or outdated, revise or remove it.
-- If AI repeatedly makes wrong decisions, the issue may be this file — not only the AI.
+- Inspect affected files and adjacent contracts before changing behavior.
+- Keep edits narrow and preserve established naming and folder conventions.
+- Run `pnpm format`, `pnpm check`, and `pnpm build` before completion.
+- Require `pnpm check` to report 0 errors, 0 warnings, and 0 hints.
+- Smoke-check every changed route and interaction, including client navigation,
+  full-page terminal navigation, keyboard behavior, pointer gating, and reduced
+  motion when relevant.
+- Review the final diff for unintended content, asset, schema, route, dependency,
+  or generated-file changes.
+- Report exactly what changed, why it changed, and the exact result of every
+  required command and smoke check.
