@@ -25,6 +25,7 @@ pnpm-debug.log*
 
 # setting folder
 .idea/
+.worktrees/
 .vscode/settings.json
 .codex
 # Claude Code workspace state (machine-local tooling, not project source)
