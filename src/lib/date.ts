@@ -1,6 +1,3 @@
-// Purpose: Format dates for display.
-// Scope: Shared date formatting helper.
-// Audience: Pages and components showing dates.
 import { siteConfig } from "../config/site";
 
 const displayDateFormatter = new Intl.DateTimeFormat(siteConfig.locale, {

@@ -1,7 +1,3 @@
-// Purpose: Coordinate cover morph naming and hero-image readiness.
-// Scope: Manages card/detail transition names and bounded image preloading.
-// Audience: BaseLayout pages (content listings and detail routes).
-
 import type {
   TransitionBeforePreparationEvent,
   TransitionBeforeSwapEvent,

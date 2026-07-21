@@ -2,6 +2,7 @@
 title: "The Best AI Model Is the One You Can Actually Use"
 description: "A personal note about comparing AI tools by whether they fit into real work, not just by how smart they seem."
 pubDate: 2026-05-03
+updatedDate: 2026-07-21
 category: "essay"
 tags: ["ai", "tools", "coding", "studying"]
 cover: ../../assets/content/writing/best-ai-model-you-can-actually-use/cover.jpg
@@ -73,9 +74,9 @@ Right now, I use Copilot more as part of my assistant setup. I might write about
 
 The funny thing is that using all these tools made me care more about my own setup than the models themselves.
 
-For agentic work, especially non-academic projects like this site or game projects, I started making small systems to save context. On this site, for example, I have an `AGENTS.md` file that tells coding agents the rules of the project: what the site is, which folders matter, what should not be changed, and what checks need to pass before a task is finished.
+For agentic work, especially non-academic projects like this site or game projects, I keep one short `AGENTS.md` file with the project's stable facts: what the site is, where things live, what must not change, and which checks have to pass.
 
-I also keep docs like `ARCHITECTURE.md`, `docs/AGENT_MAP.md`, and `docs/WORKFLOW_REFERENCE.md`. They are not fancy, but they stop the agent from guessing. Instead of rediscovering the same project structure every time, the agent can read the map and start closer to the actual problem.
+Process is separate. I use the Superpowers plugin for brainstorming, planning, implementation, review, and verification. Approved designs and implementation plans live under `docs/superpowers/`, so the project rules stay small while each larger change still leaves a useful trail.
 
 That also saves usage.
 

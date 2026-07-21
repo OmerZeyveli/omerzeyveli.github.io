@@ -1,6 +1,3 @@
-// Purpose: Provide site-wide configuration and navigation data.
-// Scope: Shared settings used by layouts and pages.
-// Audience: Site UI and metadata layers.
 const locale = "en-US";
 
 export const siteConfig = {

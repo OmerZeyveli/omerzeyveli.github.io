@@ -1,7 +1,3 @@
-// Purpose: Physics-driven soccer ball easter egg that roams BaseLayout pages.
-// Scope: Viewport-fixed ball with gravity, one-way platforms, grab throws.
-// Audience: Desktop fine-pointer visitors without reduced-motion preference.
-
 // Marks the file as a module so its top-level names stay file-scoped for
 // astro check (matchMedia constants also exist in card-tilt.ts).
 export {};

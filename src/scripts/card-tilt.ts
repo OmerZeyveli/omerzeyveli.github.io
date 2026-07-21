@@ -1,7 +1,3 @@
-// Purpose: Drive the 3D tilt + glare hover effect on content cards.
-// Scope: Pointer-driven CSS variable updates for elements with .card-tilt.
-// Audience: Card UI components (projects/writing/reviews).
-
 const FINE_POINTER = window.matchMedia("(hover: hover) and (pointer: fine)");
 const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)");
 const MAX_TILT_DEG = 3.5;
