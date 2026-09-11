@@ -6,7 +6,14 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   site: "https://www.omerzeyveli.com",
-  integrations: [react(), mdx(), sitemap()],
+  integrations: [
+    react(),
+    mdx(),
+    sitemap({
+      // Google verification pages for a private tool; keep them out of the sitemap.
+      filter: (page) => !page.includes("/youtube-analytics/"),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },
