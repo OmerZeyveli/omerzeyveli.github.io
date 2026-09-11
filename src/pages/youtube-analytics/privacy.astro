@@ -1,0 +1,163 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { siteConfig } from "../../config/site";
+
+const title = "YouTube Analytics Tool Privacy Policy";
+const description =
+  "Privacy policy for the personal YouTube Analytics tool: what data it accesses, how it is used, and how to revoke access.";
+const lastUpdated = "2026-09-11";
+const linkClass =
+  "underline decoration-zinc-600 underline-offset-4 transition-colors hover:text-zinc-100 hover:decoration-zinc-300";
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="mx-auto max-w-3xl space-y-8">
+    <header class="space-y-4">
+      <p class="text-sm uppercase tracking-[0.2em] text-zinc-400">
+        Privacy Policy
+      </p>
+      <h1
+        class="text-3xl font-semibold tracking-tight sm:text-4xl"
+        data-ball-obstacle="text"
+      >
+        YouTube Analytics Tool Privacy Policy
+      </h1>
+      <p class="text-sm text-zinc-500">
+        Last updated: <time datetime={lastUpdated}>{lastUpdated}</time>
+      </p>
+      <p class="leading-7 text-zinc-300">
+        This policy describes how the
+        <a href="/youtube-analytics/" class={linkClass}
+          >YouTube Analytics Tool</a
+        >
+        ("the tool") handles data. The tool is a private, single-user application
+        operated by {siteConfig.name} (Ömer Zeyveli) to read analytics data from my
+        own YouTube channel.
+      </p>
+    </header>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold tracking-tight">
+        Use of YouTube API Services
+      </h2>
+      <p class="leading-7 text-zinc-300">
+        The tool uses YouTube API Services. By using it, I agree to be bound by
+        the
+        <a
+          href="https://www.youtube.com/t/terms"
+          class={linkClass}
+          rel="noopener noreferrer"
+          target="_blank">YouTube Terms of Service</a
+        >. Data obtained through YouTube API Services is also subject to the
+        <a
+          href="https://policies.google.com/privacy"
+          class={linkClass}
+          rel="noopener noreferrer"
+          target="_blank">Google Privacy Policy</a
+        >.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold tracking-tight">Data accessed</h2>
+      <p class="leading-7 text-zinc-300">
+        After I sign in with my Google account and grant permission, the tool
+        requests read-only access to the following data for the YouTube channel
+        I own:
+      </p>
+      <ul class="list-disc space-y-2 pl-6 leading-7 text-zinc-300">
+        <li>
+          Channel analytics reports, such as views, watch time, estimated
+          minutes watched, subscriber changes, and traffic sources.
+        </li>
+        <li>
+          Basic channel and video metadata needed to label those reports, such
+          as channel name, video titles, and video IDs.
+        </li>
+      </ul>
+      <p class="leading-7 text-zinc-300">
+        The tool does not request write access. It cannot upload, edit, or
+        delete videos, comments, playlists, or channel settings.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold tracking-tight">How data is used</h2>
+      <ul class="list-disc space-y-2 pl-6 leading-7 text-zinc-300">
+        <li>Data is used only to display analytics reports to me.</li>
+        <li>
+          Data is not sold, shared with third parties, or used for advertising.
+        </li>
+        <li>
+          Data is not used to build profiles of any person other than the
+          channel owner, and no other users exist.
+        </li>
+      </ul>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold tracking-tight">
+        Storage and retention
+      </h2>
+      <ul class="list-disc space-y-2 pl-6 leading-7 text-zinc-300">
+        <li>
+          OAuth tokens are stored locally on my own device so that I do not have
+          to sign in every time. They are never transmitted anywhere other than
+          to Google's APIs.
+        </li>
+        <li>
+          Fetched analytics data may be cached locally for convenience. Cached
+          data is deleted when I clear it or remove the tool.
+        </li>
+        <li>
+          No data is stored on a server operated by me, and this website does
+          not collect or store any data from the tool.
+        </li>
+      </ul>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold tracking-tight">Cookies and tracking</h2>
+      <p class="leading-7 text-zinc-300">
+        The tool itself does not set cookies or use analytics or tracking
+        services. Google may set cookies during the Google sign-in flow, which
+        is governed by the Google Privacy Policy linked above.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold tracking-tight">Revoking access</h2>
+      <p class="leading-7 text-zinc-300">
+        Access granted to the tool can be revoked at any time from the
+        <a
+          href="https://security.google.com/settings/security/permissions"
+          class={linkClass}
+          rel="noopener noreferrer"
+          target="_blank">Google security settings page</a
+        >. Revoking access immediately invalidates the stored OAuth tokens. Any
+        locally cached data can be removed by deleting the tool's local files.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold tracking-tight">Changes</h2>
+      <p class="leading-7 text-zinc-300">
+        This policy may be updated if the tool's behaviour changes. The date at
+        the top of this page reflects the most recent revision.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold tracking-tight">Contact</h2>
+      <p class="leading-7 text-zinc-300">
+        Questions about this policy can be sent through
+        <a
+          href={siteConfig.social.github}
+          class={linkClass}
+          rel="noopener noreferrer"
+          target="_blank">GitHub</a
+        >.
+      </p>
+    </section>
+  </article>
+</BaseLayout>

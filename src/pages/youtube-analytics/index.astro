@@ -1,0 +1,82 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { siteConfig } from "../../config/site";
+
+const title = "YouTube Analytics Tool";
+const description =
+  "A personal, single-user tool that reads analytics data from my own YouTube channel through the YouTube Analytics API.";
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="mx-auto max-w-3xl space-y-8">
+    <header class="space-y-4">
+      <p class="text-sm uppercase tracking-[0.2em] text-zinc-400">Project</p>
+      <h1
+        class="text-3xl font-semibold tracking-tight sm:text-4xl"
+        data-ball-obstacle="text"
+      >
+        YouTube Analytics Tool
+      </h1>
+      <p class="leading-7 text-zinc-300">{description}</p>
+    </header>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold tracking-tight">What it does</h2>
+      <p class="leading-7 text-zinc-300">
+        This is a small, private utility built and used by {siteConfig.name}
+        (Ömer Zeyveli). It connects to my own YouTube channel and pulls analytics
+        reports such as views, watch time, subscriber changes, and traffic sources,
+        so I can review them outside of YouTube Studio.
+      </p>
+      <p class="leading-7 text-zinc-300">
+        The tool is not a public service. It is not offered to other users, and
+        it only ever accesses the YouTube channel that I personally own and sign
+        in with.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold tracking-tight">How it works</h2>
+      <ul class="list-disc space-y-2 pl-6 leading-7 text-zinc-300">
+        <li>
+          Authentication uses Google OAuth 2.0. I sign in with my own Google
+          account and grant read-only access to my YouTube analytics data.
+        </li>
+        <li>
+          The tool uses YouTube API Services, specifically the YouTube Analytics
+          API and, where needed, the YouTube Data API in read-only mode.
+        </li>
+        <li>
+          Reports are fetched on demand and displayed locally. Nothing is
+          published, shared, or sold.
+        </li>
+      </ul>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold tracking-tight">Privacy</h2>
+      <p class="leading-7 text-zinc-300">
+        Details about which data is accessed, how it is used, and how access can
+        be revoked are described in the
+        <a
+          href="/youtube-analytics/privacy/"
+          class="underline decoration-zinc-600 underline-offset-4 transition-colors hover:text-zinc-100 hover:decoration-zinc-300"
+          >privacy policy</a
+        >.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold tracking-tight">Contact</h2>
+      <p class="leading-7 text-zinc-300">
+        Questions about this tool can be sent through
+        <a
+          href={siteConfig.social.github}
+          class="underline decoration-zinc-600 underline-offset-4 transition-colors hover:text-zinc-100 hover:decoration-zinc-300"
+          rel="noopener noreferrer"
+          target="_blank">GitHub</a
+        >.
+      </p>
+    </section>
+  </article>
+</BaseLayout>
